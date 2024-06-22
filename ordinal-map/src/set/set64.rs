@@ -109,7 +109,8 @@ impl<T: Ordinal> FromIterator<T> for Set64<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::util::{test_exact_size_iterator, Example4};
+    use crate::tests::util::test_exact_size_iterator;
+    use crate::tests::util::Example4;
     use crate::Set64;
 
     // Fails at compilation time (as expected).

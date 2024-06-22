@@ -1,10 +1,12 @@
 #![cfg(test)]
 
 use std::fmt::Debug;
-use quickcheck::{Arbitrary, Gen};
 
-use crate::Ordinal;
+use quickcheck::Arbitrary;
+use quickcheck::Gen;
+
 use crate as ordinal_map;
+use crate::Ordinal;
 
 pub(crate) fn test_ordinal<T: Ordinal + Ord + Eq + Debug>(expected: impl IntoIterator<Item = T>) {
     let expected = Vec::from_iter(expected);
@@ -36,7 +38,8 @@ pub(crate) enum Example4 {
 
 impl Arbitrary for Example4 {
     fn arbitrary(g: &mut Gen) -> Self {
-        *g.choose(&[Example4::A, Example4::B, Example4::C, Example4::D]).unwrap()
+        *g.choose(&[Example4::A, Example4::B, Example4::C, Example4::D])
+            .unwrap()
     }
 
     fn shrink(&self) -> Box<dyn Iterator<Item=Self>> {

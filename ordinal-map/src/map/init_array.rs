@@ -1,5 +1,6 @@
 use std::convert::Infallible;
 use std::marker::PhantomData;
+use std::ops::Index;
 
 use crate::array_builder::ArrayBuilder;
 use crate::Ordinal;
@@ -7,6 +8,25 @@ use crate::Ordinal;
 /// Like [`InitMap`](crate::InitMap), but without heap allocation.
 ///
 /// Due to limitations of stable Rust, ordinal size must be passed as a third type parameter.
+///
+/// # Example
+///
+/// ```
+/// use ordinal_map::InitArrayMap;
+/// use ordinal_map::Ordinal;
+///
+/// #[derive(Ordinal, Debug)]
+/// enum Color {
+///     Red,
+///     Green,
+///     Blue,
+/// }
+///
+/// let map: InitArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
+///     InitArrayMap::new(|color| format!("{color:?}").to_lowercase());
+///
+/// assert_eq!("green", map[Color::Green]);
+/// ```
 #[repr(C)]
 pub struct InitArrayMap<K, V, const S: usize> {
     map: [V; S],
@@ -68,6 +88,22 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
 
     pub fn values_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut V> {
         self.map.iter_mut()
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> Index<K> for InitArrayMap<K, V, S> {
+    type Output = V;
+
+    fn index(&self, index: K) -> &Self::Output {
+        &self.map[index.ordinal()]
+    }
+}
+
+impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for InitArrayMap<K, V, S> {
+    type Output = V;
+
+    fn index(&self, index: &'a K) -> &Self::Output {
+        &self.map[index.ordinal()]
     }
 }
 
