@@ -14,7 +14,7 @@ use crate::Ordinal;
 /// # Example
 ///
 /// ```
-/// use ordinal_map::InitArrayMap;
+/// use ordinal_map::map::InitArrayMap;
 /// use ordinal_map::Ordinal;
 ///
 /// #[derive(Ordinal, Debug)]
