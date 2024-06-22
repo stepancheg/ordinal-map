@@ -1,6 +1,6 @@
 pub mod __macro_refs;
 mod iterator;
-mod map;
+pub mod map;
 mod ordinal;
 mod set;
 pub(crate) mod tests;

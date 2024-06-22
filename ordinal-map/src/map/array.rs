@@ -44,7 +44,7 @@ impl<K: Ordinal, V, const S: usize> ArrayMap<K, V, S> {
             .filter_map(|(k, v)| v.as_mut().map(|v| (k, v)))
     }
 
-    pub fn keys(&self) -> impl Iterator<Item = K> {
+    pub fn keys(&self) -> crate::Iter<K> {
         self.map.keys()
     }
 

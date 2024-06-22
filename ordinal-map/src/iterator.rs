@@ -3,6 +3,7 @@ use std::ops::Range;
 
 use crate::Ordinal;
 
+/// Iterate over all values of an ordinal.
 pub struct Iter<T> {
     range: Range<usize>,
     _phantom: PhantomData<T>,
