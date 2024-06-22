@@ -3,6 +3,8 @@ use std::marker::PhantomData;
 use std::ops::Index;
 
 use crate::array_builder::ArrayBuilder;
+use crate::map::InitIter;
+use crate::map::InitIterMut;
 use crate::Ordinal;
 
 /// Like [`InitMap`](crate::InitMap), but without heap allocation.
@@ -70,12 +72,12 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         &mut self.map[key.ordinal()]
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = (K, &'a V)> {
-        crate::Iter::<K>::new().zip(self.map.iter())
+    pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
+        InitIter::new(self.map.iter().enumerate())
     }
 
-    pub fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = (K, &'a mut V)> {
-        crate::Iter::<K>::new().zip(self.map.iter_mut())
+    pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
+        InitIterMut::new(self.map.iter_mut().enumerate())
     }
 
     pub fn keys(&self) -> crate::Iter<K> {

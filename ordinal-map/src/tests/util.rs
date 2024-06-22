@@ -42,7 +42,7 @@ impl Arbitrary for Example4 {
             .unwrap()
     }
 
-    fn shrink(&self) -> Box<dyn Iterator<Item=Self>> {
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
         Box::new(match self {
             Example4::A => vec![].into_iter(),
             Example4::B => vec![Example4::A].into_iter(),
