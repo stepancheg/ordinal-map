@@ -1,11 +1,15 @@
+#[cfg(test)]
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
+
 pub mod __macro_refs;
-mod iterator;
+mod iter;
 pub mod map;
 mod ordinal;
 mod set;
 pub(crate) mod tests;
 
-pub use iterator::Iter;
+pub use iter::Iter;
 pub use map::array::ArrayMap;
 pub use map::init::InitMap;
 pub use map::init_array::InitArrayMap;

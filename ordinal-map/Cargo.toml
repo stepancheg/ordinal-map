@@ -5,3 +5,7 @@ edition = "2021"
 
 [dependencies]
 ordinal-map-derive = { path = "../ordinal-map-derive" }
+
+[dev-dependencies]
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"
