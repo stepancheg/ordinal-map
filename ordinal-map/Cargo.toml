@@ -1,0 +1,7 @@
+[package]
+name = "ordinal-map"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ordinal-map-derive = { path = "../ordinal-map-derive" }

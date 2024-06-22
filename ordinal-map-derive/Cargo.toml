@@ -1,0 +1,13 @@
+[package]
+name = "ordinal-map-derive"
+version = "0.1.0"
+edition = "2021"
+
+# make this proc-macro
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2.0.67", features = ["full"] }
+proc-macro2 = "1.0.86"
+quote = "1.0.36"

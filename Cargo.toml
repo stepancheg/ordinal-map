@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = [
+    "ordinal-map",
+    "ordinal-map-derive",
+]
