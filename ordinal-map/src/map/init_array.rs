@@ -8,14 +8,14 @@ use crate::map::InitIter;
 use crate::map::InitIterMut;
 use crate::Ordinal;
 
-/// Like [`InitMap`](crate::map::InitMap), but without heap allocation.
+/// Like [`InitMap`](crate::map::OrdinalInitMap), but without heap allocation.
 ///
 /// Due to limitations of stable Rust, ordinal size must be passed as a third type parameter.
 ///
 /// # Example
 ///
 /// ```
-/// use ordinal_map::map::InitArrayMap;
+/// use ordinal_map::map::OrdinalInitArrayMap;
 /// use ordinal_map::Ordinal;
 ///
 /// #[derive(Ordinal, Debug)]
@@ -25,18 +25,18 @@ use crate::Ordinal;
 ///     Blue,
 /// }
 ///
-/// let map: InitArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
-///     InitArrayMap::new(|color| format!("{color:?}").to_lowercase());
+/// let map: OrdinalInitArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
+///     OrdinalInitArrayMap::new(|color| format!("{color:?}").to_lowercase());
 ///
 /// assert_eq!("green", map[Color::Green]);
 /// ```
 #[repr(C)]
-pub struct InitArrayMap<K, V, const S: usize> {
+pub struct OrdinalInitArrayMap<K, V, const S: usize> {
     map: [V; S],
     _phantom: PhantomData<K>,
 }
 
-impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
     const ASSERT: () = {
         assert!(K::ORDINAL_SIZE == S, "K::ORDINAL_SIZE != S");
     };
@@ -48,7 +48,7 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         for v in crate::Iter::<K>::new() {
             a.push(init(v)?);
         }
-        Ok(InitArrayMap {
+        Ok(OrdinalInitArrayMap {
             map: a.finish(),
             _phantom: PhantomData,
         })
@@ -105,7 +105,7 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
     }
 }
 
-impl<K: Ordinal, V, const S: usize> Index<K> for InitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalInitArrayMap<K, V, S> {
     type Output = V;
 
     fn index(&self, index: K) -> &Self::Output {
@@ -113,7 +113,7 @@ impl<K: Ordinal, V, const S: usize> Index<K> for InitArrayMap<K, V, S> {
     }
 }
 
-impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for InitArrayMap<K, V, S> {
+impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, V, S> {
     type Output = V;
 
     fn index(&self, index: &'a K) -> &Self::Output {

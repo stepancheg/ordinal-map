@@ -2,10 +2,10 @@ use std::marker::PhantomData;
 
 use crate::Ordinal;
 
-/// Iterator over elements of [`Set`].
+/// Iterator over elements of [`OrdinalSet`].
 pub struct Iter<'a, T> {
     iter: crate::Iter<T>,
-    set: SliceSet<'a, T>,
+    set: OrdinalMapRef<'a, T>,
 }
 
 impl<'a, T: Ordinal> Iterator for Iter<'a, T> {
@@ -43,12 +43,12 @@ enum SetImpl {
 
 impl SetImpl {}
 
-struct SliceSet<'a, T> {
+struct OrdinalMapRef<'a, T> {
     words: &'a [u64],
     _phantom: PhantomData<T>,
 }
 
-impl<'a, T: Ordinal> SliceSet<'a, T> {
+impl<'a, T: Ordinal> OrdinalMapRef<'a, T> {
     #[inline]
     fn contains(&self, ordinal: &T) -> bool {
         let Some(word) = self.words.get(ordinal.ordinal() / u64::BITS as usize) else {
@@ -65,19 +65,19 @@ impl<'a, T: Ordinal> SliceSet<'a, T> {
 ///
 /// This map allocates memory when the number of elements is greater than 64.
 /// When the number of elements is known to be less than or equal to 64,
-/// consider using [`Set64`](crate::set::Set64) instead.
-pub struct Set<T: Ordinal> {
+/// consider using [`Set64`](crate::set::OrdinalSet64) instead.
+pub struct OrdinalSet<T: Ordinal> {
     set: SetImpl,
     _phantom: PhantomData<T>,
 }
 
-impl<T: Ordinal> Set<T> {
+impl<T: Ordinal> OrdinalSet<T> {
     const IS_SMALL: bool = T::ORDINAL_SIZE <= u64::BITS as usize;
 
     /// Create a new empty set.
     #[inline]
     pub fn new() -> Self {
-        Set {
+        OrdinalSet {
             set: if Self::IS_SMALL {
                 SetImpl::Small(0)
             } else {
@@ -88,13 +88,13 @@ impl<T: Ordinal> Set<T> {
     }
 
     #[inline]
-    fn slice_set(&self) -> SliceSet<T> {
+    fn slice_set(&self) -> OrdinalMapRef<T> {
         match (Self::IS_SMALL, &self.set) {
-            (true, SetImpl::Small(set)) => SliceSet {
+            (true, SetImpl::Small(set)) => OrdinalMapRef {
                 words: std::slice::from_ref(set),
                 _phantom: PhantomData,
             },
-            (false, SetImpl::Large(set)) => SliceSet {
+            (false, SetImpl::Large(set)) => OrdinalMapRef {
                 words: set,
                 _phantom: PhantomData,
             },
@@ -143,15 +143,15 @@ impl<T: Ordinal> Set<T> {
     }
 }
 
-impl<T: Ordinal> Default for Set<T> {
+impl<T: Ordinal> Default for OrdinalSet<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: Ordinal> FromIterator<T> for Set<T> {
+impl<T: Ordinal> FromIterator<T> for OrdinalSet<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut set = Set::new();
+        let mut set = OrdinalSet::new();
         for ordinal in iter {
             set.insert(ordinal);
         }
@@ -164,12 +164,12 @@ mod tests {
     use std::collections::HashSet;
     use std::num::NonZeroU16;
 
-    use crate::set::Set;
+    use crate::set::OrdinalSet;
     use crate::tests::util::Example4;
 
     #[quickcheck]
     fn qc_insert_small(values: Vec<Example4>, check: Vec<Example4>) {
-        let mut set: Set<Example4> = Set::new();
+        let mut set: OrdinalSet<Example4> = OrdinalSet::new();
         let mut control: HashSet<Example4> = HashSet::new();
         for value in &values {
             let control_inserted = control.insert(*value);
@@ -184,7 +184,7 @@ mod tests {
 
     #[quickcheck]
     fn qc_insert_large(values: Vec<NonZeroU16>, check: Vec<NonZeroU16>) {
-        let mut set: Set<NonZeroU16> = Set::new();
+        let mut set: OrdinalSet<NonZeroU16> = OrdinalSet::new();
         let mut control: HashSet<NonZeroU16> = HashSet::new();
         for value in &values {
             let control_inserted = control.insert(*value);
@@ -199,7 +199,7 @@ mod tests {
 
     #[quickcheck]
     fn qc_iter_small(mut values: Vec<Example4>) -> bool {
-        let set = Set::from_iter(values.iter().copied());
+        let set = OrdinalSet::from_iter(values.iter().copied());
         values.sort();
         values.dedup();
         set.iter().collect::<Vec<_>>() == values
@@ -207,7 +207,7 @@ mod tests {
 
     #[quickcheck]
     fn qc_iter_large(mut values: Vec<NonZeroU16>) -> bool {
-        let set = Set::from_iter(values.iter().copied());
+        let set = OrdinalSet::from_iter(values.iter().copied());
         values.sort();
         values.dedup();
         set.iter().collect::<Vec<_>>() == values

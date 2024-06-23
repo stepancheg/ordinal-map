@@ -5,8 +5,8 @@ use std::slice;
 use crate::Ordinal;
 
 /// Iterator created from
-/// [`InitMap`](crate::map::InitMap) and
-/// [`InitArrayMap`](crate::map::InitArrayMap).
+/// [`InitMap`](crate::map::OrdinalInitMap) and
+/// [`InitArrayMap`](crate::map::OrdinalInitArrayMap).
 pub struct InitIter<'a, K, V> {
     iter: iter::Enumerate<slice::Iter<'a, V>>,
     _phantom: PhantomData<K>,
@@ -50,8 +50,8 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for InitIter<'a, K, V> {
 }
 
 /// Mutable iterator created from
-/// [`InitMap`](crate::map::InitMap) and
-/// [`InitArrayMap`](crate::map::InitArrayMap).
+/// [`InitMap`](crate::map::OrdinalInitMap) and
+/// [`InitArrayMap`](crate::map::OrdinalInitArrayMap).
 pub struct InitIterMut<'a, K, V> {
     iter: iter::Enumerate<slice::IterMut<'a, V>>,
     _phantom: PhantomData<K>,

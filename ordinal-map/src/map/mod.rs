@@ -8,9 +8,9 @@ pub(crate) mod init_iter;
 pub(crate) mod iter;
 pub(crate) mod map;
 
-pub use array::ArrayMap;
-pub use init::InitMap;
-pub use init_array::InitArrayMap;
+pub use array::OrdinalArrayMap;
+pub use init::OrdinalInitMap;
+pub use init_array::OrdinalInitArrayMap;
 pub use init_iter::InitIter;
 pub use init_iter::InitIterMut;
-pub use map::Map;
+pub use map::OrdinalMap;

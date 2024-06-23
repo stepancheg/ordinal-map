@@ -1,4 +1,4 @@
-use crate::map::init_array::InitArrayMap;
+use crate::map::init_array::OrdinalInitArrayMap;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::Ordinal;
@@ -10,7 +10,7 @@ use crate::Ordinal;
 /// # Example
 ///
 /// ```
-/// use ordinal_map::map::ArrayMap;
+/// use ordinal_map::map::OrdinalArrayMap;
 /// use ordinal_map::Ordinal;
 /// #[derive(Ordinal)]
 /// enum Weather {
@@ -19,19 +19,19 @@ use crate::Ordinal;
 ///     Snowy,
 /// }
 ///
-/// let mut map = ArrayMap::<_, _, { Weather::ORDINAL_SIZE }>::new();
+/// let mut map = OrdinalArrayMap::<_, _, { Weather::ORDINAL_SIZE }>::new();
 /// map.insert(Weather::Sunny, "good");
 /// map.insert(Weather::Rainy, "it depends");
 /// ```
-pub struct ArrayMap<K, V, const S: usize> {
-    map: InitArrayMap<K, Option<V>, S>,
+pub struct OrdinalArrayMap<K, V, const S: usize> {
+    map: OrdinalInitArrayMap<K, Option<V>, S>,
 }
 
-impl<K: Ordinal, V, const S: usize> ArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     /// Create a new map.
     pub fn new() -> Self {
-        ArrayMap {
-            map: InitArrayMap::new(|_| None),
+        OrdinalArrayMap {
+            map: OrdinalInitArrayMap::new(|_| None),
         }
     }
 

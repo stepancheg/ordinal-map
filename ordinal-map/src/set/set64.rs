@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use crate::Ordinal;
 
-/// Iterator over [`Set64`].
+/// Iterator over [`OrdinalSet64`].
 pub struct Iter64<T> {
     set: u64,
     _phantom: PhantomData<T>,
@@ -43,14 +43,15 @@ impl<T: Ordinal> DoubleEndedIterator for Iter64<T> {
 
 /// Set for implementations of [`Ordinal`](crate::Ordinal) with a maximum ordinal size of 64.
 ///
-/// This is implemented using a single `u64` bitset.
+/// This is implemented using a single `u64` value to store the set of elements.
+/// To store set of arbitrary size, consider using [`OrdinalSet`](crate::set::OrdinalSet).
 #[derive(Clone, Copy, Eq, PartialEq)]
-pub struct Set64<T: Ordinal> {
+pub struct OrdinalSet64<T: Ordinal> {
     set: u64,
     _phantom: PhantomData<T>,
 }
 
-impl<T: Ordinal> Set64<T> {
+impl<T: Ordinal> OrdinalSet64<T> {
     const ASSERT: () = {
         assert!(T::ORDINAL_SIZE <= u64::BITS as usize);
     };
@@ -59,7 +60,7 @@ impl<T: Ordinal> Set64<T> {
     #[inline]
     pub const fn new() -> Self {
         const { Self::ASSERT };
-        Set64 {
+        OrdinalSet64 {
             set: 0,
             _phantom: PhantomData,
         }
@@ -69,7 +70,7 @@ impl<T: Ordinal> Set64<T> {
     #[inline]
     pub fn all() -> Self {
         const { Self::ASSERT };
-        Set64 {
+        OrdinalSet64 {
             set: (1 << T::ORDINAL_SIZE) - 1,
             _phantom: PhantomData,
         }
@@ -102,15 +103,15 @@ impl<T: Ordinal> Set64<T> {
     }
 }
 
-impl<T: Ordinal> Default for Set64<T> {
+impl<T: Ordinal> Default for OrdinalSet64<T> {
     fn default() -> Self {
-        Set64::new()
+        OrdinalSet64::new()
     }
 }
 
-impl<T: Ordinal> FromIterator<T> for Set64<T> {
+impl<T: Ordinal> FromIterator<T> for OrdinalSet64<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut set = Set64::new();
+        let mut set = OrdinalSet64::new();
         for ordinal in iter {
             set.set |= 1 << ordinal.ordinal();
         }
@@ -120,7 +121,7 @@ impl<T: Ordinal> FromIterator<T> for Set64<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::set::Set64;
+    use crate::set::OrdinalSet64;
     use crate::tests::util::test_exact_size_iterator;
     use crate::tests::util::Example4;
 
@@ -132,13 +133,13 @@ mod tests {
 
     #[test]
     fn test_all() {
-        let set = Set64::<Example4>::all();
+        let set = OrdinalSet64::<Example4>::all();
         assert_eq!(set.set, 0b1111);
     }
 
     #[quickcheck]
     fn qc_iterator(mut values: Vec<Example4>) -> bool {
-        let set = Set64::from_iter(values.iter().copied());
+        let set = OrdinalSet64::from_iter(values.iter().copied());
         values.sort();
         values.dedup();
         set.iter().collect::<Vec<_>>() == values
@@ -146,7 +147,7 @@ mod tests {
 
     #[quickcheck]
     fn qc_double_ended_iterator(mut values: Vec<Example4>) -> bool {
-        let set = Set64::from_iter(values.iter().copied());
+        let set = OrdinalSet64::from_iter(values.iter().copied());
         values.sort();
         values.dedup();
         set.iter().rev().collect::<Vec<_>>() == values.into_iter().rev().collect::<Vec<_>>()
@@ -154,6 +155,6 @@ mod tests {
 
     #[quickcheck]
     fn qc_exact_size_iterator(values: Vec<Example4>) {
-        test_exact_size_iterator(Set64::from_iter(values).iter());
+        test_exact_size_iterator(OrdinalSet64::from_iter(values).iter());
     }
 }

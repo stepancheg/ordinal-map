@@ -6,7 +6,16 @@
 /// - some builtin types like [`Option`] and [`Result`]
 /// - and it can be derived with the `#[derive(Ordinal)]` attribute for structs and enums
 ///
-/// # Example
+/// # Relation to `Ord` and `PartialOrd`
+///
+/// Implementations provided in this crate and generated with `#[derive(Ordinal)]`
+/// are compatible with `Ord` and `PartialOrd`, meaning `a < b <=> a.ordinal() < b.ordinal()`.
+/// This is not enforced by the trait itself, but it is a good practice to follow.
+///
+/// # Derive
+///
+/// `#[derive(Ordinal)]` works for arbitrary structs and enums.
+/// Generated implementation is compatible with `#[derive(PartialOrd)]`.
 ///
 /// ```
 /// use ordinal_map::Ordinal;

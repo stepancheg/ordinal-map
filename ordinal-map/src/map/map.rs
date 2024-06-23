@@ -9,17 +9,21 @@ use crate::Ordinal;
 /// Map [`Ordinal`](crate::Ordinal) keys to values.
 /// Map operations are constant time
 /// (provided that [`K::ordinal()`](Ordinal::ordinal) is constant time).
-pub struct Map<K, V> {
+///
+/// This implementation allocates a boxed slice `[Option<V>; K::ORDINAL_SIZE]`
+/// on the first insertion. For non-allocating map, consider using
+/// [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
+pub struct OrdinalMap<K, V> {
     map: Box<[Option<V>]>,
     _phantom: PhantomData<K>,
 }
 
-impl<K: Ordinal, V> Map<K, V> {
+impl<K: Ordinal, V> OrdinalMap<K, V> {
     /// Create a new empty map.
     /// This operation does not allocate memory, but first insertion allocates the whole map.
     #[inline]
     pub fn new() -> Self {
-        Map {
+        OrdinalMap {
             map: Box::default(),
             _phantom: PhantomData,
         }

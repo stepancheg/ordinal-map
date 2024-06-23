@@ -8,24 +8,23 @@ use crate::map::init_iter::InitIterMut;
 use crate::Ordinal;
 
 /// Map implementation where all values must be initialized at creation.
-/// (But can be changed later.)
 ///
 /// This version of map allocates values on the heap in a single contiguous block.
 /// For a version that doesn't require heap allocation,
-/// see [`InitArrayMap`](crate::map::InitArrayMap).
-pub struct InitMap<T, V> {
+/// see [`InitArrayMap`](crate::map::OrdinalInitArrayMap).
+pub struct OrdinalInitMap<T, V> {
     map: Box<[V]>,
     _phantom: PhantomData<T>,
 }
 
-impl<K: Ordinal, V> InitMap<K, V> {
+impl<K: Ordinal, V> OrdinalInitMap<K, V> {
     /// Create a new map by initializing each value with a function.
     pub fn try_new<E>(mut init: impl FnMut(K) -> Result<V, E>) -> Result<Self, E> {
         let mut map = Vec::with_capacity(K::ORDINAL_SIZE);
         for v in crate::Iter::<K>::new() {
             map.push(init(v)?);
         }
-        Ok(InitMap {
+        Ok(OrdinalInitMap {
             map: map.into_boxed_slice(),
             _phantom: PhantomData,
         })
@@ -81,13 +80,13 @@ impl<K: Ordinal, V> InitMap<K, V> {
     }
 }
 
-impl<K: Ordinal, V: Default> Default for InitMap<K, V> {
+impl<K: Ordinal, V: Default> Default for OrdinalInitMap<K, V> {
     fn default() -> Self {
-        InitMap::new(|_| V::default())
+        OrdinalInitMap::new(|_| V::default())
     }
 }
 
-impl<K: Ordinal, V> Index<K> for InitMap<K, V> {
+impl<K: Ordinal, V> Index<K> for OrdinalInitMap<K, V> {
     type Output = V;
 
     fn index(&self, key: K) -> &Self::Output {
@@ -95,7 +94,7 @@ impl<K: Ordinal, V> Index<K> for InitMap<K, V> {
     }
 }
 
-impl<'a, K: Ordinal, V> Index<&'a K> for InitMap<K, V> {
+impl<'a, K: Ordinal, V> Index<&'a K> for OrdinalInitMap<K, V> {
     type Output = V;
 
     fn index(&self, key: &'a K) -> &Self::Output {
