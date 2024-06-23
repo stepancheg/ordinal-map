@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+use std::fmt::Formatter;
 use std::marker::PhantomData;
 
 use crate::set::Iter;
@@ -38,5 +40,11 @@ impl<'a, T> Clone for OrdinalSetRef<'a, T> {
             words: self.words,
             _phantom: PhantomData,
         }
+    }
+}
+
+impl<'a, T: Ordinal + Debug> Debug for OrdinalSetRef<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_set().entries(self.clone().iter()).finish()
     }
 }

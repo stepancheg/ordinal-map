@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Debug;
+use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::slice;
 
@@ -95,6 +98,12 @@ impl<T: Ordinal> FromIterator<T> for OrdinalSet<T> {
             set.insert(ordinal);
         }
         set
+    }
+}
+
+impl<T: Ordinal + Debug> Debug for OrdinalSet<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        Debug::fmt(&self.as_ref(), f)
     }
 }
 

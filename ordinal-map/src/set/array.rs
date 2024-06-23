@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Debug;
 use std::marker::PhantomData;
 
 use crate::set::set_mut::OrdinalSetMut;
@@ -71,6 +73,12 @@ impl<T: Ordinal, const S: usize> FromIterator<T> for OrdinalArraySet<T, S> {
             set.insert(value);
         }
         set
+    }
+}
+
+impl<T: Ordinal + Debug> Debug for OrdinalArraySet<T, 1> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Debug::fmt(&self.as_ref(), f)
     }
 }
 

@@ -1,7 +1,10 @@
 use std::fmt;
 use std::fmt::Debug;
+use std::fmt::Formatter;
 use std::marker::PhantomData;
+use std::slice;
 
+use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
 /// Iterator over [`OrdinalSet64`].
@@ -88,6 +91,10 @@ impl<T: Ordinal> OrdinalSet64<T> {
         }
     }
 
+    fn as_ref(&self) -> OrdinalSetRef<T> {
+        OrdinalSetRef::new(slice::from_ref(&self.set))
+    }
+
     /// Create a set containing all possible elements of [`K`](Ordinal).
     #[inline]
     pub fn all() -> Self {
@@ -138,6 +145,12 @@ impl<T: Ordinal> FromIterator<T> for OrdinalSet64<T> {
             set.set |= 1 << ordinal.ordinal();
         }
         set
+    }
+}
+
+impl<T: Ordinal + Debug> Debug for OrdinalSet64<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        Debug::fmt(&self.as_ref(), f)
     }
 }
 
