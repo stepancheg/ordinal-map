@@ -2,6 +2,7 @@ use std::convert::Infallible;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Index;
+use std::ops::IndexMut;
 use std::slice;
 
 use crate::array_builder::ArrayBuilder;
@@ -119,6 +120,18 @@ impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, 
 
     fn index(&self, index: &'a K) -> &Self::Output {
         &self.map[index.ordinal()]
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> IndexMut<K> for OrdinalInitArrayMap<K, V, S> {
+    fn index_mut(&mut self, index: K) -> &mut Self::Output {
+        &mut self.map[index.ordinal()]
+    }
+}
+
+impl<'a, K: Ordinal, V, const S: usize> IndexMut<&'a K> for OrdinalInitArrayMap<K, V, S> {
+    fn index_mut(&mut self, index: &'a K) -> &mut Self::Output {
+        &mut self.map[index.ordinal()]
     }
 }
 

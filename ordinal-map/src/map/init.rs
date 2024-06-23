@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::ops::Index;
+use std::ops::IndexMut;
 use std::slice;
 
 use crate::map::init_iter::InitIter;
@@ -101,6 +102,18 @@ impl<'a, K: Ordinal, V> Index<&'a K> for OrdinalInitMap<K, V> {
 
     fn index(&self, key: &'a K) -> &Self::Output {
         self.get(key)
+    }
+}
+
+impl<K: Ordinal, V> IndexMut<K> for OrdinalInitMap<K, V> {
+    fn index_mut(&mut self, key: K) -> &mut Self::Output {
+        self.get_mut(&key)
+    }
+}
+
+impl<'a, K: Ordinal, V> IndexMut<&'a K> for OrdinalInitMap<K, V> {
+    fn index_mut(&mut self, key: &'a K) -> &mut Self::Output {
+        self.get_mut(key)
     }
 }
 
