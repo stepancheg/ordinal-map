@@ -19,16 +19,6 @@ pub struct OrdinalArraySet<T, const S: usize> {
     _phantom: PhantomData<T>,
 }
 
-impl<T, const S: usize> Default for OrdinalArraySet<T, S> {
-    #[inline]
-    fn default() -> Self {
-        OrdinalArraySet {
-            words: [0; S],
-            _phantom: PhantomData,
-        }
-    }
-}
-
 impl<T: Ordinal, const S: usize> OrdinalArraySet<T, S> {
     const ASSERT: () = assert!(S == (T::ORDINAL_SIZE + 63) / 64);
 
@@ -61,6 +51,26 @@ impl<T: Ordinal, const S: usize> OrdinalArraySet<T, S> {
     #[inline]
     pub fn insert(&mut self, ordinal: T) -> bool {
         self.as_mut().insert(ordinal)
+    }
+}
+
+impl<T, const S: usize> Default for OrdinalArraySet<T, S> {
+    #[inline]
+    fn default() -> Self {
+        OrdinalArraySet {
+            words: [0; S],
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<T: Ordinal, const S: usize> FromIterator<T> for OrdinalArraySet<T, S> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut set = OrdinalArraySet::new();
+        for value in iter {
+            set.insert(value);
+        }
+        set
     }
 }
 

@@ -87,3 +87,44 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
         self.map.values_mut().filter_map(|v| v.as_mut())
     }
 }
+
+impl<K: Ordinal, V, const S: usize> Default for OrdinalArrayMap<K, V, S> {
+    fn default() -> Self {
+        OrdinalArrayMap::new()
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> FromIterator<(K, V)> for OrdinalArrayMap<K, V, S> {
+    fn from_iter<I: IntoIterator<Item = (K, V)>>(iter: I) -> Self {
+        let mut map = OrdinalArrayMap::new();
+        for (key, value) in iter {
+            map.insert(key, value);
+        }
+        map
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use crate::map::OrdinalArrayMap;
+    use crate::Ordinal;
+
+    #[quickcheck]
+    fn qc(values: Vec<(u8, u32)>, check: Vec<u8>) {
+        let mut map: OrdinalArrayMap<u8, u32, { u8::ORDINAL_SIZE }> = OrdinalArrayMap::new();
+        let mut control: HashMap<u8, u32> = HashMap::new();
+
+        for (key, value) in &values {
+            let control_inserted = control.insert(*key, *value);
+            let inserted = map.insert(*key, *value);
+            assert_eq!(control_inserted, inserted);
+            assert_eq!(control.len(), map.len());
+        }
+
+        for key in &check {
+            assert_eq!(control.get(key), map.get(key));
+        }
+    }
+}
