@@ -1,5 +1,9 @@
 use std::marker::PhantomData;
 
+use crate::map::iter::Iter;
+use crate::map::iter::IterMut;
+use crate::map::InitIter;
+use crate::map::InitIterMut;
 use crate::Ordinal;
 
 pub struct Map<T, V> {
@@ -46,10 +50,12 @@ impl<K: Ordinal, V> Map<K, V> {
         self.map.get_mut(key.ordinal())?.take()
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = (K, &'a V)> {
-        crate::Iter::<K>::new()
-            .zip(self.map.iter())
-            .filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
+    pub fn iter<'a>(&'a self) -> Iter<'a, K, V> {
+        Iter::new(InitIter::new(self.map.iter().enumerate()))
+    }
+
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, K, V> {
+        IterMut::new(InitIterMut::new(self.map.iter_mut().enumerate()))
     }
 
     pub fn keys(&self) -> impl Iterator<Item = K> + '_ {

@@ -1,4 +1,6 @@
 use crate::map::init_array::InitArrayMap;
+use crate::map::iter::Iter;
+use crate::map::iter::IterMut;
 use crate::Ordinal;
 
 pub struct ArrayMap<K, V, const S: usize> {
@@ -32,16 +34,12 @@ impl<K: Ordinal, V, const S: usize> ArrayMap<K, V, S> {
         self.map.get_mut(key).take()
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item = (K, &'a V)> {
-        self.map
-            .iter()
-            .filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
+    pub fn iter<'a>(&'a self) -> Iter<'a, K, V> {
+        Iter::new(self.map.iter())
     }
 
-    pub fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = (K, &'a mut V)> {
-        self.map
-            .iter_mut()
-            .filter_map(|(k, v)| v.as_mut().map(|v| (k, v)))
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, K, V> {
+        IterMut::new(self.map.iter_mut())
     }
 
     pub fn keys(&self) -> crate::Iter<K> {

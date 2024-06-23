@@ -1,8 +1,8 @@
 use std::convert::Infallible;
 use std::marker::PhantomData;
 
-use crate::map::iter::InitIter;
-use crate::map::iter::InitIterMut;
+use crate::map::init_iter::InitIter;
+use crate::map::init_iter::InitIterMut;
 use crate::Ordinal;
 
 pub struct InitMap<T, V> {
