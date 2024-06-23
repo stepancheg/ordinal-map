@@ -2,6 +2,9 @@ use std::marker::PhantomData;
 
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
+use crate::map::iter::Keys;
+use crate::map::iter::Values;
+use crate::map::iter::ValuesMut;
 use crate::map::InitIter;
 use crate::map::InitIterMut;
 use crate::Ordinal;
@@ -30,21 +33,25 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     }
 
     /// Returns a reference to the value corresponding to the key.
+    #[inline]
     pub fn get<'a>(&'a self, key: &K) -> Option<&'a V> {
         self.map.get(key.ordinal())?.as_ref()
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
+    #[inline]
     pub fn get_mut<'a>(&'a mut self, key: &K) -> Option<&'a mut V> {
         self.map.get_mut(key.ordinal())?.as_mut()
     }
 
     /// Returns the number of elements in the map. This is an `O(K::ORDINAL_SIZE)` operation.
+    #[inline]
     pub fn len(&self) -> usize {
         self.iter().count()
     }
 
     /// Insert a value into the map, returning the previous value if it existed.
+    #[inline]
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         if let Some(v) = self.map.get_mut(key.ordinal()) {
             v.replace(value)
@@ -60,32 +67,44 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     }
 
     /// Remove a value from the map, returning it if it existed.
+    #[inline]
     pub fn remove(&mut self, key: &K) -> Option<V> {
         self.map.get_mut(key.ordinal())?.take()
     }
 
     /// Iterate over the map.
-    pub fn iter<'a>(&'a self) -> Iter<'a, K, V> {
+    #[inline]
+    pub fn iter(&self) -> Iter<K, V> {
         Iter::new(InitIter::new(self.map.iter().enumerate()))
     }
 
     /// Iterate over the map mutably.
-    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, K, V> {
+    #[inline]
+    pub fn iter_mut(&mut self) -> IterMut<K, V> {
         IterMut::new(InitIterMut::new(self.map.iter_mut().enumerate()))
     }
 
     /// Iterate over the keys of the map.
-    pub fn keys(&self) -> impl Iterator<Item = K> + '_ {
-        self.iter().map(|(k, _)| k)
+    #[inline]
+    pub fn keys(&self) -> Keys<K, V> {
+        Keys::new(self.iter())
     }
 
     /// Iterate over the values of the map.
-    pub fn values<'a>(&'a self) -> impl Iterator<Item = &'a V> {
-        self.iter().map(|(_, v)| v)
+    #[inline]
+    pub fn values(&self) -> Values<K, V> {
+        Values::new(self.iter())
+    }
+
+    /// Iterate over the mutable references to the values of the map.
+    #[inline]
+    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+        ValuesMut::new(self.iter_mut())
     }
 }
 
 impl<K: Ordinal, V> Default for OrdinalMap<K, V> {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

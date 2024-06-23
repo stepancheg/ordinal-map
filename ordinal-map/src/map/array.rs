@@ -1,6 +1,9 @@
 use crate::map::init_array::OrdinalInitArrayMap;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
+use crate::map::iter::ValuesMut;
+use crate::map::Keys;
+use crate::map::Values;
 use crate::Ordinal;
 
 /// Map backed by an array.
@@ -73,22 +76,23 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     }
 
     /// Iterate over the keys of the map.
-    pub fn keys(&self) -> crate::Iter<K> {
-        self.map.keys()
+    pub fn keys(&self) -> Keys<K, V> {
+        Keys::new(self.iter())
     }
 
     /// Iterate over the values of the map.
-    pub fn values<'a>(&'a self) -> impl Iterator<Item = &'a V> {
-        self.map.values().filter_map(|v| v.as_ref())
+    pub fn values(&self) -> Values<K, V> {
+        Values::new(self.iter())
     }
 
     /// Iterate over the values of the map mutably.
-    pub fn values_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut V> {
-        self.map.values_mut().filter_map(|v| v.as_mut())
+    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+        ValuesMut::new(self.iter_mut())
     }
 }
 
 impl<K: Ordinal, V, const S: usize> Default for OrdinalArrayMap<K, V, S> {
+    #[inline]
     fn default() -> Self {
         OrdinalArrayMap::new()
     }
