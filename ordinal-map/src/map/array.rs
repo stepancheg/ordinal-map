@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Debug;
+
 use crate::map::init_array::OrdinalInitArrayMap;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
@@ -105,6 +108,12 @@ impl<K: Ordinal, V, const S: usize> FromIterator<(K, V)> for OrdinalArrayMap<K, 
             map.insert(key, value);
         }
         map
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalArrayMap<K, V, 1> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
     }
 }
 

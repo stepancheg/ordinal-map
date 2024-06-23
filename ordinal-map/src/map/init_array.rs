@@ -1,4 +1,5 @@
 use std::convert::Infallible;
+use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Index;
 use std::slice;
@@ -118,6 +119,12 @@ impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, 
 
     fn index(&self, index: &'a K) -> &Self::Output {
         &self.map[index.ordinal()]
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalInitArrayMap<K, V, S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
     }
 }
 

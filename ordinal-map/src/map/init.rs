@@ -1,4 +1,6 @@
 use std::convert::Infallible;
+use std::fmt::Debug;
+use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::ops::Index;
 use std::slice;
@@ -99,6 +101,12 @@ impl<'a, K: Ordinal, V> Index<&'a K> for OrdinalInitMap<K, V> {
 
     fn index(&self, key: &'a K) -> &Self::Output {
         self.get(key)
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalInitMap<K, V> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
     }
 }
 

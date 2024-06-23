@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Debug;
 use std::marker::PhantomData;
 
 use crate::map::iter::Iter;
@@ -117,6 +119,12 @@ impl<K: Ordinal, V> FromIterator<(K, V)> for OrdinalMap<K, V> {
             map.insert(k, v);
         }
         map
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalMap<K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
     }
 }
 
