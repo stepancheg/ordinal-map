@@ -8,8 +8,10 @@ use crate::map::iter::IterMut;
 use crate::map::iter::Keys;
 use crate::map::iter::Values;
 use crate::map::iter::ValuesMut;
+use crate::map::InitIntoIter;
 use crate::map::InitIter;
 use crate::map::InitIterMut;
+use crate::map::IntoIter;
 use crate::Ordinal;
 
 /// Map [`Ordinal`](crate::Ordinal) keys to values.
@@ -79,7 +81,7 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     /// Iterate over the map.
     #[inline]
     pub fn iter(&self) -> Iter<K, V> {
-        Iter::new(InitIter::new(self.map.iter()))
+        Iter::new(InitIter::new(self.map.iter(), 0))
     }
 
     /// Iterate over the map mutably.
@@ -148,6 +150,26 @@ impl<K, V: Clone> Clone for OrdinalMap<K, V> {
 impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalMap<K, V> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.iter()).finish()
+    }
+}
+
+impl<K: Ordinal, V> IntoIterator for OrdinalMap<K, V> {
+    type Item = (K, V);
+    type IntoIter = IntoIter<K, V>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter::new(InitIntoIter::new(self.map.into_vec().into_iter()))
+    }
+}
+
+impl<'a, K: Ordinal, V> IntoIterator for &'a OrdinalMap<K, V> {
+    type Item = (K, &'a V);
+    type IntoIter = Iter<'a, K, V>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

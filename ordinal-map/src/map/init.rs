@@ -8,6 +8,7 @@ use std::slice;
 
 use crate::map::init_iter::InitIter;
 use crate::map::init_iter::InitIterMut;
+use crate::map::InitIntoIter;
 use crate::Ordinal;
 
 /// Map implementation where all values must be initialized at creation.
@@ -83,11 +84,13 @@ impl<K: Ordinal, V> OrdinalInitMap<K, V> {
     }
 
     /// Iterate over the map.
+    #[inline]
     pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
-        InitIter::new(self.map.iter())
+        InitIter::new(self.map.iter(), 0)
     }
 
     /// Iterate over the map mutably.
+    #[inline]
     pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
         InitIterMut::new(self.map.iter_mut())
     }
@@ -139,6 +142,24 @@ impl<K, V: Clone> Clone for OrdinalInitMap<K, V> {
 impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalInitMap<K, V> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_map().entries(self.iter()).finish()
+    }
+}
+
+impl<K: Ordinal, V> IntoIterator for OrdinalInitMap<K, V> {
+    type Item = (K, V);
+    type IntoIter = InitIntoIter<K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        InitIntoIter::new(self.map.into_vec().into_iter())
+    }
+}
+
+impl<'a, K: Ordinal, V> IntoIterator for &'a OrdinalInitMap<K, V> {
+    type Item = (K, &'a V);
+    type IntoIter = InitIter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

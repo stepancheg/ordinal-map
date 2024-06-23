@@ -2,6 +2,7 @@ use std::fmt;
 use std::fmt::Debug;
 
 use crate::map::init_array::OrdinalInitArrayMap;
+use crate::map::iter::IntoIterArray;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::map::iter::ValuesMut;
@@ -116,6 +117,20 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     pub fn clear(&mut self) {
         self.drain();
     }
+
+    /// Retain only the elements specified by the predicate.
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(K, &mut V) -> bool,
+    {
+        for (key, value_opt) in self.map.iter_mut() {
+            if let Some(value) = value_opt {
+                if !f(key, value) {
+                    *value_opt = None;
+                }
+            }
+        }
+    }
 }
 
 impl<K: Ordinal, V, const S: usize> Default for OrdinalArrayMap<K, V, S> {
@@ -149,9 +164,30 @@ impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalArrayMap<K, 
     }
 }
 
+impl<K: Ordinal, V, const S: usize> IntoIterator for OrdinalArrayMap<K, V, S> {
+    type Item = (K, V);
+    type IntoIter = IntoIterArray<K, V, S>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIterArray::new(self.map.into_iter())
+    }
+}
+
+impl<'a, K: Ordinal, V, const S: usize> IntoIterator for &'a OrdinalArrayMap<K, V, S> {
+    type Item = (K, &'a V);
+    type IntoIter = Iter<'a, K, V>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::collections::HashSet;
 
     use crate::map::OrdinalArrayMap;
     use crate::Ordinal;
@@ -171,5 +207,18 @@ mod tests {
         for key in &check {
             assert_eq!(control.get(key), map.get(key));
         }
+    }
+
+    #[quickcheck]
+    fn qc_retain(values: Vec<(u8, u32)>, retain: Vec<u8>) -> bool {
+        let retain: HashSet<u8> = HashSet::from_iter(retain);
+
+        let mut map = OrdinalArrayMap::<u8, u32, { u8::ORDINAL_SIZE }>::from_iter(values.clone());
+        let mut control: HashMap<u8, u32> = HashMap::from_iter(values);
+
+        map.retain(|key, _| retain.contains(&key));
+        control.retain(|key, _| retain.contains(key));
+
+        control == HashMap::from_iter(map)
     }
 }

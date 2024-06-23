@@ -6,6 +6,7 @@ use std::ops::IndexMut;
 use std::slice;
 
 use crate::array_builder::ArrayBuilder;
+use crate::map::init_iter::InitIntoIterArray;
 use crate::map::InitIter;
 use crate::map::InitIterMut;
 use crate::Ordinal;
@@ -83,7 +84,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
 
     /// Iterate over the map.
     pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
-        InitIter::new(self.map.iter())
+        InitIter::new(self.map.iter(), 0)
     }
 
     /// Iterate over the map mutably.
@@ -160,6 +161,24 @@ impl<K, V: Clone, const S: usize> Clone for OrdinalInitArrayMap<K, V, S> {
 impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalInitArrayMap<K, V, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_map().entries(self.iter()).finish()
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> IntoIterator for OrdinalInitArrayMap<K, V, S> {
+    type Item = (K, V);
+    type IntoIter = InitIntoIterArray<K, V, S>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        InitIntoIterArray::new(self.map.into_iter())
+    }
+}
+
+impl<'a, K: Ordinal, V, const S: usize> IntoIterator for &'a OrdinalInitArrayMap<K, V, S> {
+    type Item = (K, &'a V);
+    type IntoIter = InitIter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

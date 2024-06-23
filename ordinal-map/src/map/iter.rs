@@ -1,7 +1,10 @@
 use std::fmt::Debug;
 use std::fmt::Formatter;
+use std::marker::PhantomData;
 use std::mem;
 
+use crate::map::init_iter::InitIntoIterArray;
+use crate::map::InitIntoIter;
 use crate::map::InitIter;
 use crate::map::InitIterMut;
 use crate::Ordinal;
@@ -12,7 +15,7 @@ pub struct Iter<'a, K, V> {
     iter: InitIter<'a, K, Option<V>>,
 }
 
-impl<'a, K: Ordinal, V> Iter<'a, K, V> {
+impl<'a, K, V> Iter<'a, K, V> {
     #[inline]
     pub(crate) fn new(iter: InitIter<'a, K, Option<V>>) -> Self {
         Iter { iter }
@@ -305,6 +308,125 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Drain<'a, K, V> {
             if let Some(v) = mem::take(v) {
                 return Some((k, v));
             }
+        }
+    }
+}
+
+/// Iterator created from [`OrdinalInitArrayMap`](crate::map::OrdinalInitArrayMap).
+pub struct IntoIterArray<K, V, const S: usize> {
+    iter: InitIntoIterArray<K, Option<V>, S>,
+    _phantom: PhantomData<K>,
+}
+
+impl<K: Ordinal, V, const S: usize> IntoIterArray<K, V, S> {
+    #[inline]
+    pub(crate) fn new(iter: InitIntoIterArray<K, Option<V>, S>) -> Self {
+        IntoIterArray {
+            iter,
+            _phantom: PhantomData,
+        }
+    }
+
+    fn iter(&self) -> Iter<K, V> {
+        Iter::new(self.iter.iter())
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> Iterator for IntoIterArray<K, V, S> {
+    type Item = (K, V);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next()?;
+            if let Some(v) = v {
+                return Some((k, v));
+            }
+        }
+    }
+}
+
+impl<K: Ordinal, V, const S: usize> DoubleEndedIterator for IntoIterArray<K, V, S> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next_back()?;
+            if let Some(v) = v {
+                return Some((k, v));
+            }
+        }
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for IntoIterArray<K, V, S> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+
+impl<K, V: Clone, const S: usize> Clone for IntoIterArray<K, V, S> {
+    fn clone(&self) -> Self {
+        IntoIterArray {
+            iter: self.iter.clone(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
+/// Iterator created from [`OrdinalMap`](crate::map::OrdinalMap).
+pub struct IntoIter<K, V> {
+    iter: InitIntoIter<K, Option<V>>,
+}
+
+impl<K, V> IntoIter<K, V> {
+    pub(crate) fn new(iter: InitIntoIter<K, Option<V>>) -> Self {
+        IntoIter { iter }
+    }
+
+    fn iter(&self) -> Iter<K, V> {
+        Iter::new(self.iter.iter())
+    }
+}
+
+impl<K: Ordinal, V> Iterator for IntoIter<K, V> {
+    type Item = (K, V);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next()?;
+            if let Some(v) = v {
+                return Some((k, v));
+            }
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.iter.len()))
+    }
+}
+
+impl<K: Ordinal, V> DoubleEndedIterator for IntoIter<K, V> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next_back()?;
+            if let Some(v) = v {
+                return Some((k, v));
+            }
+        }
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug> Debug for IntoIter<K, V> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+
+impl<K, V: Clone> Clone for IntoIter<K, V> {
+    fn clone(&self) -> Self {
+        IntoIter {
+            iter: self.iter.clone(),
         }
     }
 }
