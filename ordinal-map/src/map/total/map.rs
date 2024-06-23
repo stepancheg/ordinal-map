@@ -6,9 +6,9 @@ use std::ops::Index;
 use std::ops::IndexMut;
 use std::slice;
 
-use crate::map::total_iter::TotalIter;
-use crate::map::total_iter::TotalIterMut;
-use crate::map::TotalIntoIter;
+use crate::map::total::iter::TotalIter;
+use crate::map::total::iter::TotalIterMut;
+use crate::map::total::TotalIntoIter;
 use crate::Ordinal;
 
 /// Map implementation where all values must be initialized at creation.

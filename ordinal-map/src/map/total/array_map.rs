@@ -6,9 +6,9 @@ use std::ops::IndexMut;
 use std::slice;
 
 use crate::array_builder::ArrayBuilder;
-use crate::map::total_iter::TotalIntoIterArray;
-use crate::map::TotalIter;
-use crate::map::TotalIterMut;
+use crate::map::total::iter::TotalIntoIterArray;
+use crate::map::total::TotalIter;
+use crate::map::total::TotalIterMut;
 use crate::Ordinal;
 
 /// Like [`InitMap`](crate::map::OrdinalTotalMap), but without heap allocation.
@@ -18,7 +18,7 @@ use crate::Ordinal;
 /// # Example
 ///
 /// ```
-/// use ordinal_map::map::OrdinalTotalArrayMap;
+/// use ordinal_map::map::total::OrdinalTotalArrayMap;
 /// use ordinal_map::Ordinal;
 ///
 /// #[derive(Ordinal, Debug)]

@@ -8,11 +8,11 @@ use crate::map::iter::IterMut;
 use crate::map::iter::Keys;
 use crate::map::iter::Values;
 use crate::map::iter::ValuesMut;
+use crate::map::total::TotalIntoIter;
+use crate::map::total::TotalIter;
+use crate::map::total::TotalIterMut;
 use crate::map::Entry;
 use crate::map::IntoIter;
-use crate::map::TotalIntoIter;
-use crate::map::TotalIter;
-use crate::map::TotalIterMut;
 use crate::Ordinal;
 
 /// Map [`Ordinal`](crate::Ordinal) keys to values.

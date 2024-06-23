@@ -5,7 +5,7 @@ use crate::map::iter::IntoIterArray;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::map::iter::ValuesMut;
-use crate::map::total_array_map::OrdinalTotalArrayMap;
+use crate::map::total::array_map::OrdinalTotalArrayMap;
 use crate::map::Drain;
 use crate::map::Entry;
 use crate::map::Keys;

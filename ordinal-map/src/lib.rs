@@ -9,8 +9,8 @@
 //! # Example
 //!
 //! ```
+//! use ordinal_map::map::total::OrdinalTotalMap;
 //! use ordinal_map::map::OrdinalMap;
-//! use ordinal_map::map::OrdinalTotalMap;
 //! #[derive(ordinal_map::Ordinal)]
 //! enum ErrorCategory {
 //!     Network,

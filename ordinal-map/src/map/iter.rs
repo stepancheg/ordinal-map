@@ -3,10 +3,10 @@ use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::mem;
 
-use crate::map::total_iter::TotalIntoIterArray;
-use crate::map::TotalIntoIter;
-use crate::map::TotalIter;
-use crate::map::TotalIterMut;
+use crate::map::total::iter::TotalIntoIterArray;
+use crate::map::total::TotalIntoIter;
+use crate::map::total::TotalIter;
+use crate::map::total::TotalIterMut;
 use crate::Ordinal;
 
 /// Iterator over the entries of
