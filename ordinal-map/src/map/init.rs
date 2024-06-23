@@ -1,5 +1,6 @@
 use std::convert::Infallible;
 use std::marker::PhantomData;
+use std::ops::Index;
 use std::slice;
 
 use crate::map::init_iter::InitIter;
@@ -66,6 +67,22 @@ impl<K: Ordinal, V> InitMap<K, V> {
 impl<K: Ordinal, V: Default> Default for InitMap<K, V> {
     fn default() -> Self {
         InitMap::new(|_| V::default())
+    }
+}
+
+impl<K: Ordinal, V> Index<K> for InitMap<K, V> {
+    type Output = V;
+
+    fn index(&self, key: K) -> &Self::Output {
+        self.get(&key)
+    }
+}
+
+impl<'a, K: Ordinal, V> Index<&'a K> for InitMap<K, V> {
+    type Output = V;
+
+    fn index(&self, key: &'a K) -> &Self::Output {
+        self.get(key)
     }
 }
 
