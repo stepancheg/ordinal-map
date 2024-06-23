@@ -20,6 +20,10 @@ use crate::Ordinal;
 /// This implementation allocates a boxed slice `[Option<V>; K::ORDINAL_SIZE]`
 /// on the first insertion. For non-allocating map, consider using
 /// [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
+///
+/// This implementation is sparse (not every key has an associated value).
+/// For a total map, see [`OrdinalTotalMap`](total::OrdinalTotalMap)
+/// and [`OrdinalTotalArrayMap`](total::OrdinalTotalArrayMap).
 pub struct OrdinalMap<K, V> {
     // Empty when the map is just created.
     map: Box<[Option<V>]>,

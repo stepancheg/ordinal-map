@@ -12,7 +12,7 @@ use crate::map::Keys;
 use crate::map::Values;
 use crate::Ordinal;
 
-/// Map backed by an array.
+/// Map backed by an array, allocated on the stack.
 ///
 /// Due to Rust limitations, the array size must be provided as a type parameter.
 ///
@@ -32,6 +32,10 @@ use crate::Ordinal;
 /// map.insert(Weather::Sunny, "good");
 /// map.insert(Weather::Rainy, "it depends");
 /// ```
+///
+/// This map is sparse (not every key has an associated value).
+/// For a total map, see [`OrdinalTotalMap`](crate::map::total::OrdinalTotalMap)
+/// and [`OrdinalTotalArrayMap`](OrdinalTotalArrayMap).
 pub struct OrdinalArrayMap<K, V, const S: usize> {
     map: OrdinalTotalArrayMap<K, Option<V>, S>,
 }
