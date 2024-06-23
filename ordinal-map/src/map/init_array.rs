@@ -81,12 +81,12 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
 
     /// Iterate over the map.
     pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
-        InitIter::new(self.map.iter().enumerate())
+        InitIter::new(self.map.iter())
     }
 
     /// Iterate over the map mutably.
     pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
-        InitIterMut::new(self.map.iter_mut().enumerate())
+        InitIterMut::new(self.map.iter_mut())
     }
 
     /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.

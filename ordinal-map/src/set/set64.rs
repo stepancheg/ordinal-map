@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Debug;
 use std::marker::PhantomData;
 
 use crate::Ordinal;
@@ -52,6 +54,12 @@ impl<T> Clone for Iter64<T> {
             set: self.set,
             _phantom: PhantomData,
         }
+    }
+}
+
+impl<T: Ordinal + Debug> Debug for Iter64<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.clone()).finish()
     }
 }
 

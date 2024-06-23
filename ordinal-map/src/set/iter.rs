@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
@@ -56,5 +58,11 @@ impl<'a, T> Clone for Iter<'a, T> {
             iter: self.iter.clone(),
             set: self.set.clone(),
         }
+    }
+}
+
+impl<'a, T: Ordinal + Debug> Debug for Iter<'a, T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.clone()).finish()
     }
 }

@@ -75,13 +75,13 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     /// Iterate over the map.
     #[inline]
     pub fn iter(&self) -> Iter<K, V> {
-        Iter::new(InitIter::new(self.map.iter().enumerate()))
+        Iter::new(InitIter::new(self.map.iter()))
     }
 
     /// Iterate over the map mutably.
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<K, V> {
-        IterMut::new(InitIterMut::new(self.map.iter_mut().enumerate()))
+        IterMut::new(InitIterMut::new(self.map.iter_mut()))
     }
 
     /// Iterate over the keys of the map.
