@@ -46,6 +46,15 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Iter<'a, K, V> {
     }
 }
 
+impl<'a, K, V> Clone for Iter<'a, K, V> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Iter {
+            iter: self.iter.clone(),
+        }
+    }
+}
+
 /// Iterator over mutable references to the entries of
 /// [`OrdinalMap`](crate::map::OrdinalMap) and [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct IterMut<'a, K, V> {
@@ -124,6 +133,15 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Keys<'a, K, V> {
     }
 }
 
+impl<'a, K: Ordinal, V> Clone for Keys<'a, K, V> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Keys {
+            iter: self.iter.clone(),
+        }
+    }
+}
+
 /// Iterator over the values of [`OrdinalMap`](crate::map::OrdinalMap)
 /// and [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct Values<'a, K, V> {
@@ -155,6 +173,15 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Values<'a, K, V> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.iter.next_back().map(|(_, v)| v)
+    }
+}
+
+impl<'a, K: Ordinal, V> Clone for Values<'a, K, V> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Values {
+            iter: self.iter.clone(),
+        }
     }
 }
 

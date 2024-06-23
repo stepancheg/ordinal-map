@@ -49,6 +49,15 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for InitIter<'a, K, V> {
     }
 }
 
+impl<'a, K, V> Clone for InitIter<'a, K, V> {
+    fn clone(&self) -> Self {
+        InitIter {
+            iter: self.iter.clone(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
 /// Mutable iterator created from
 /// [`InitMap`](crate::map::OrdinalInitMap) and
 /// [`InitArrayMap`](crate::map::OrdinalInitArrayMap).

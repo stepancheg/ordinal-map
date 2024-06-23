@@ -1,43 +1,10 @@
 use std::marker::PhantomData;
 use std::slice;
 
+use crate::set::iter::Iter;
 use crate::set::set_mut::OrdinalSetMut;
 use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
-
-/// Iterator over elements of [`OrdinalSet`].
-pub struct Iter<'a, T> {
-    iter: crate::Iter<T>,
-    set: OrdinalSetRef<'a, T>,
-}
-
-impl<'a, T: Ordinal> Iterator for Iter<'a, T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            let next = self.iter.next()?;
-            if self.set.contains(&next) {
-                return Some(next);
-            }
-        }
-    }
-
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        (0, Some(self.iter.len()))
-    }
-}
-
-impl<'a, T: Ordinal> DoubleEndedIterator for Iter<'a, T> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        loop {
-            let next = self.iter.next_back()?;
-            if self.set.contains(&next) {
-                return Some(next);
-            }
-        }
-    }
-}
 
 enum SetImpl {
     Small(u64),
@@ -111,10 +78,7 @@ impl<T: Ordinal> OrdinalSet<T> {
     /// Iterate over the elements of the set.
     #[inline]
     pub fn iter(&self) -> Iter<T> {
-        Iter {
-            iter: crate::Iter::<T>::new(),
-            set: self.as_ref(),
-        }
+        self.as_ref().iter()
     }
 }
 

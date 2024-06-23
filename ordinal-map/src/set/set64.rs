@@ -11,6 +11,7 @@ pub struct Iter64<T> {
 impl<T: Ordinal> Iterator for Iter64<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let ordinal = self.set.trailing_zeros();
         if ordinal == u64::BITS {
@@ -21,6 +22,7 @@ impl<T: Ordinal> Iterator for Iter64<T> {
         }
     }
 
+    #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         let len = self.len();
         (len, Some(len))
@@ -28,12 +30,14 @@ impl<T: Ordinal> Iterator for Iter64<T> {
 }
 
 impl<T: Ordinal> ExactSizeIterator for Iter64<T> {
+    #[inline]
     fn len(&self) -> usize {
         self.set.count_ones() as usize
     }
 }
 
 impl<T: Ordinal> DoubleEndedIterator for Iter64<T> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         let ordinal = (u64::BITS - 1).checked_sub(self.set.leading_zeros())?;
         self.set &= !(1 << ordinal);
@@ -41,11 +45,21 @@ impl<T: Ordinal> DoubleEndedIterator for Iter64<T> {
     }
 }
 
+impl<T> Clone for Iter64<T> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Iter64 {
+            set: self.set,
+            _phantom: PhantomData,
+        }
+    }
+}
+
 /// Set for implementations of [`Ordinal`](crate::Ordinal) with a maximum ordinal size of 64.
 ///
 /// This is implemented using a single `u64` value to store the set of elements.
 /// To store set of arbitrary size, consider using [`OrdinalSet`](crate::set::OrdinalSet).
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct OrdinalSet64<T: Ordinal> {
     set: u64,
     _phantom: PhantomData<T>,

@@ -49,3 +49,13 @@ impl<T: Ordinal> DoubleEndedIterator for Iter<T> {
         Some(T::from_ordinal(next).unwrap())
     }
 }
+
+impl<T> Clone for Iter<T> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Iter {
+            range: self.range.clone(),
+            _phantom: PhantomData,
+        }
+    }
+}
