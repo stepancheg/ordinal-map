@@ -1,7 +1,7 @@
 use std::fmt;
 use std::fmt::Debug;
 
-use crate::map::init_array::OrdinalInitArrayMap;
+use crate::map::init_array_map::OrdinalInitArrayMap;
 use crate::map::iter::IntoIterArray;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
@@ -62,6 +62,12 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     #[inline]
     pub fn get_mut<'a>(&'a mut self, key: &K) -> Option<&'a mut V> {
         self.map.get_mut(key).as_mut()
+    }
+
+    /// Check if the map contains a key.
+    #[inline]
+    pub fn contains_key(&self, key: &K) -> bool {
+        self.get(key).is_some()
     }
 
     /// Insert a value into the map, returning the previous value if it existed.

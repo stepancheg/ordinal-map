@@ -1,20 +1,20 @@
 //! Constant time lookup map implementations where keys implement
 //! the [`Ordinal`](crate::Ordinal) trait.
 
-pub(crate) mod array;
+pub(crate) mod array_map;
 pub(crate) mod enumerate;
-pub(crate) mod init;
-pub(crate) mod init_array;
+pub(crate) mod init_array_map;
 pub(crate) mod init_iter;
+pub(crate) mod init_map;
 pub(crate) mod iter;
 pub(crate) mod map;
 
-pub use array::OrdinalArrayMap;
-pub use init::OrdinalInitMap;
-pub use init_array::OrdinalInitArrayMap;
+pub use array_map::OrdinalArrayMap;
+pub use init_array_map::OrdinalInitArrayMap;
 pub use init_iter::InitIntoIter;
 pub use init_iter::InitIter;
 pub use init_iter::InitIterMut;
+pub use init_map::OrdinalInitMap;
 pub use iter::Drain;
 pub use iter::IntoIter;
 pub use iter::IntoIterArray;

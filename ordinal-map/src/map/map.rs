@@ -50,6 +50,12 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
         self.map.get_mut(key.ordinal())?.as_mut()
     }
 
+    /// Returns `true` if the map contains the key.
+    #[inline]
+    pub fn contains_key(&self, key: &K) -> bool {
+        self.map.get(key.ordinal()).is_some()
+    }
+
     /// Returns the number of elements in the map. This is an `O(K::ORDINAL_SIZE)` operation.
     #[inline]
     pub fn len(&self) -> usize {
