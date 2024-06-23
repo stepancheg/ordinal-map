@@ -10,6 +10,7 @@ pub struct Iter<T> {
 }
 
 impl<T: Ordinal> Iter<T> {
+    /// Create a new iterator.
     #[inline]
     pub fn new() -> Self {
         Iter {

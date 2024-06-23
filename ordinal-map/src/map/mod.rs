@@ -1,3 +1,6 @@
+//! Constant time lookup map implementations where keys implement
+//! the [`Ordinal`](crate::Ordinal) trait.
+
 pub(crate) mod array;
 pub(crate) mod init;
 pub(crate) mod init_array;

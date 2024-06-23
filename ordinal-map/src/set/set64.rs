@@ -55,8 +55,9 @@ impl<T: Ordinal> Set64<T> {
         assert!(T::ORDINAL_SIZE <= u64::BITS as usize);
     };
 
+    /// Create a new empty set.
     #[inline]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         const { Self::ASSERT };
         Set64 {
             set: 0,
@@ -64,14 +65,7 @@ impl<T: Ordinal> Set64<T> {
         }
     }
 
-    #[inline]
-    pub fn insert(&mut self, ordinal: &T) -> bool {
-        const { Self::ASSERT };
-        let r = !self.contains(ordinal);
-        self.set |= 1 << ordinal.ordinal();
-        r
-    }
-
+    /// Create a set containing all possible elements of [`K`](Ordinal).
     #[inline]
     pub fn all() -> Self {
         const { Self::ASSERT };
@@ -81,6 +75,16 @@ impl<T: Ordinal> Set64<T> {
         }
     }
 
+    /// Insert an element into the set, returning `true` if the element was not already present.
+    #[inline]
+    pub fn insert(&mut self, ordinal: &T) -> bool {
+        const { Self::ASSERT };
+        let r = !self.contains(ordinal);
+        self.set |= 1 << ordinal.ordinal();
+        r
+    }
+
+    /// Iterate over the elements of the set.
     #[inline]
     pub fn iter(&self) -> Iter64<T> {
         const { Self::ASSERT };
@@ -90,6 +94,7 @@ impl<T: Ordinal> Set64<T> {
         }
     }
 
+    /// Check if the set contains an element.
     #[inline]
     pub fn contains(&self, ordinal: &T) -> bool {
         const { Self::ASSERT };

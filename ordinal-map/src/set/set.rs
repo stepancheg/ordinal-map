@@ -9,6 +9,14 @@ enum SetImpl {
 
 impl SetImpl {}
 
+/// Default set implementation.
+///
+/// All operations are constant time
+/// (provided that [`T::ordinal()`](Ordinal::ordinal) is constant time).
+///
+/// This map allocates memory when the number of elements is greater than 64.
+/// When the number of elements is known to be less than or equal to 64,
+/// consider using [`Set64`](crate::set::Set64) instead.
 pub struct Set<T: Ordinal> {
     set: SetImpl,
     _phantom: PhantomData<T>,
@@ -17,6 +25,7 @@ pub struct Set<T: Ordinal> {
 impl<T: Ordinal> Set<T> {
     const IS_SMALL: bool = T::ORDINAL_SIZE <= u64::BITS as usize;
 
+    /// Create a new empty set.
     #[inline]
     pub fn new() -> Self {
         Set {
@@ -29,6 +38,7 @@ impl<T: Ordinal> Set<T> {
         }
     }
 
+    /// Check if the set contains an element.
     #[inline]
     pub fn contains(&self, ordinal: &T) -> bool {
         match (Self::IS_SMALL, &self.set) {
@@ -42,6 +52,8 @@ impl<T: Ordinal> Set<T> {
             _ => unreachable!(),
         }
     }
+
+    // TODO: add iterator.
 }
 
 #[cfg(test)]

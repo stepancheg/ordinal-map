@@ -41,6 +41,7 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         assert!(K::ORDINAL_SIZE == S, "K::ORDINAL_SIZE != S");
     };
 
+    /// Create a new map by initializing each value with a function.
     pub fn try_new<E>(mut init: impl FnMut(K) -> Result<V, E>) -> Result<Self, E> {
         const { Self::ASSERT };
         let mut a = ArrayBuilder::new();
@@ -53,6 +54,7 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         })
     }
 
+    /// Create a new map by initializing each value with a function.
     pub fn new(mut init: impl FnMut(K) -> V) -> Self {
         const { Self::ASSERT };
         match Self::try_new(move |k| Ok::<_, Infallible>(init(k))) {
@@ -61,34 +63,43 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         }
     }
 
+    /// Returns the number of elements in the map, which is
+    /// always equal to [`K::ORDINAL_SIZE`](Ordinal::ORDINAL_SIZE).
     pub const fn len(&self) -> usize {
         S
     }
 
+    /// Returns a reference to the value corresponding to the key.
     pub fn get<'a>(&'a self, key: &K) -> &'a V {
         &self.map[key.ordinal()]
     }
 
+    /// Returns a mutable reference to the value corresponding to the key.
     pub fn get_mut<'a>(&'a mut self, key: &K) -> &'a mut V {
         &mut self.map[key.ordinal()]
     }
 
+    /// Iterate over the map.
     pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
         InitIter::new(self.map.iter().enumerate())
     }
 
+    /// Iterate over the map mutably.
     pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
         InitIterMut::new(self.map.iter_mut().enumerate())
     }
 
+    /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.
     pub fn keys(&self) -> crate::Iter<K> {
         crate::Iter::<K>::new()
     }
 
+    /// Iterate values of the map.
     pub fn values<'a>(&'a self) -> slice::Iter<'a, V> {
         self.map.iter()
     }
 
+    /// Iterate mutable references to values of the map.
     pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
     }
