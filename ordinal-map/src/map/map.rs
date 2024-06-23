@@ -8,6 +8,7 @@ use crate::map::iter::IterMut;
 use crate::map::iter::Keys;
 use crate::map::iter::Values;
 use crate::map::iter::ValuesMut;
+use crate::map::Entry;
 use crate::map::InitIntoIter;
 use crate::map::InitIter;
 use crate::map::InitIterMut;
@@ -62,20 +63,28 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
         self.iter().count()
     }
 
-    /// Insert a value into the map, returning the previous value if it existed.
-    #[inline]
-    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
-        if let Some(v) = self.map.get_mut(key.ordinal()) {
-            v.replace(value)
-        } else {
+    fn init_full_map(&mut self) {
+        if self.map.is_empty() {
             let mut map = Vec::with_capacity(K::ORDINAL_SIZE);
             for _ in 0..K::ORDINAL_SIZE {
                 map.push(None);
             }
-            map[key.ordinal()] = Some(value);
             self.map = map.into_boxed_slice();
-            None
         }
+    }
+
+    /// Insert a value into the map, returning the previous value if it existed.
+    #[inline]
+    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+        self.init_full_map();
+        self.map[key.ordinal()].replace(value)
+    }
+
+    /// Get an entry in the map for the given key.
+    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+        self.init_full_map();
+        let entry = &mut self.map[key.ordinal()];
+        Entry::new(key, entry)
     }
 
     /// Remove a value from the map, returning it if it existed.

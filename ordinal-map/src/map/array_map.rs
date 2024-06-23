@@ -7,6 +7,7 @@ use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::map::iter::ValuesMut;
 use crate::map::Drain;
+use crate::map::Entry;
 use crate::map::Keys;
 use crate::map::Values;
 use crate::Ordinal;
@@ -74,6 +75,13 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     #[inline]
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         self.map.get_mut(&key).replace(value)
+    }
+
+    /// Get an entry in the map for the given key.
+    #[inline]
+    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+        let entry = &mut self.map[&key];
+        Entry::new(key, entry)
     }
 
     /// Remove a value from the map, returning it if it existed.

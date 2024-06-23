@@ -2,6 +2,7 @@
 //! the [`Ordinal`](crate::Ordinal) trait.
 
 pub(crate) mod array_map;
+pub(crate) mod entry;
 pub(crate) mod enumerate;
 pub(crate) mod init_array_map;
 pub(crate) mod init_iter;
@@ -10,6 +11,9 @@ pub(crate) mod iter;
 pub(crate) mod map;
 
 pub use array_map::OrdinalArrayMap;
+pub use entry::Entry;
+pub use entry::OccupiedEntry;
+pub use entry::VacantEntry;
 pub use init_array_map::OrdinalInitArrayMap;
 pub use init_iter::InitIntoIter;
 pub use init_iter::InitIter;

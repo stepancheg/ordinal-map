@@ -94,6 +94,8 @@ impl<K: Ordinal, V> OrdinalInitMap<K, V> {
     pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
         InitIterMut::new(self.map.iter_mut())
     }
+
+    // TODO: add insert
 }
 
 impl<K: Ordinal, V: Default> Default for OrdinalInitMap<K, V> {

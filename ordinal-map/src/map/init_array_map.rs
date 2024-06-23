@@ -119,6 +119,8 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
     pub fn into_values(self) -> [V; S] {
         self.map
     }
+
+    // TODO: add insert
 }
 
 impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalInitArrayMap<K, V, S> {
