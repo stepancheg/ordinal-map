@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 use std::marker::PhantomData;
 use std::ops::Index;
+use std::slice;
 
 use crate::array_builder::ArrayBuilder;
 use crate::map::InitIter;
@@ -84,11 +85,11 @@ impl<K: Ordinal, V, const S: usize> InitArrayMap<K, V, S> {
         crate::Iter::<K>::new()
     }
 
-    pub fn values<'a>(&'a self) -> impl Iterator<Item = &'a V> {
+    pub fn values<'a>(&'a self) -> slice::Iter<'a, V> {
         self.map.iter()
     }
 
-    pub fn values_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut V> {
+    pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
     }
 }

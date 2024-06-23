@@ -1,5 +1,6 @@
 use std::convert::Infallible;
 use std::marker::PhantomData;
+use std::slice;
 
 use crate::map::init_iter::InitIter;
 use crate::map::init_iter::InitIterMut;
@@ -45,11 +46,11 @@ impl<K: Ordinal, V> InitMap<K, V> {
         crate::Iter::<K>::new()
     }
 
-    pub fn values<'a>(&'a self) -> impl Iterator<Item = &'a V> {
+    pub fn values<'a>(&'a self) -> slice::Iter<'a, V> {
         self.map.iter()
     }
 
-    pub fn values_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut V> {
+    pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
     }
 
