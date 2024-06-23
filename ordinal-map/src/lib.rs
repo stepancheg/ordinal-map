@@ -1,3 +1,5 @@
+#![deny(rustdoc::broken_intra_doc_links)]
+
 #[cfg(test)]
 #[macro_use(quickcheck)]
 extern crate quickcheck_macros;

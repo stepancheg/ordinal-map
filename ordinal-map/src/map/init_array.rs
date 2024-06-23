@@ -8,7 +8,7 @@ use crate::map::InitIter;
 use crate::map::InitIterMut;
 use crate::Ordinal;
 
-/// Like [`InitMap`](crate::InitMap), but without heap allocation.
+/// Like [`InitMap`](crate::map::InitMap), but without heap allocation.
 ///
 /// Due to limitations of stable Rust, ordinal size must be passed as a third type parameter.
 ///
