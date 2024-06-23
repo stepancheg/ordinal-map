@@ -1,4 +1,5 @@
 use crate::Ordinal;
+use crate::__macro_refs::ordinal_size_sum;
 
 impl Ordinal for bool {
     const ORDINAL_SIZE: usize = 2;
@@ -19,10 +20,12 @@ impl Ordinal for bool {
 impl Ordinal for u8 {
     const ORDINAL_SIZE: usize = u8::MAX as usize + 1;
 
+    #[inline]
     fn ordinal(&self) -> usize {
         *self as usize
     }
 
+    #[inline]
     fn from_ordinal(ordinal: usize) -> Option<Self> {
         u8::try_from(ordinal).ok()
     }
@@ -31,44 +34,74 @@ impl Ordinal for u8 {
 impl Ordinal for i8 {
     const ORDINAL_SIZE: usize = (i8::MAX as i16 - i8::MIN as i16 + 1) as usize;
 
+    #[inline]
     fn ordinal(&self) -> usize {
         self.abs_diff(i8::MIN) as usize
     }
 
+    #[inline]
     fn from_ordinal(ordinal: usize) -> Option<Self> {
-        if ordinal < Self::ORDINAL_SIZE {
-            Some((ordinal as isize + i8::MIN as isize) as i8)
-        } else {
-            None
-        }
+        i8::MIN.checked_add_unsigned(u8::try_from(ordinal).ok()?)
     }
 }
 
 impl Ordinal for u16 {
     const ORDINAL_SIZE: usize = u16::MAX as usize + 1;
 
+    #[inline]
     fn ordinal(&self) -> usize {
         *self as usize
     }
 
+    #[inline]
     fn from_ordinal(ordinal: usize) -> Option<Self> {
         u16::try_from(ordinal).ok()
     }
 }
 
 impl Ordinal for i16 {
-    const ORDINAL_SIZE: usize = (i16::MAX as i32 - i16::MIN as i32 + 1) as usize;
+    const ORDINAL_SIZE: usize = (i16::MAX as isize - i16::MIN as isize + 1) as usize;
 
+    #[inline]
     fn ordinal(&self) -> usize {
         self.abs_diff(i16::MIN) as usize
     }
 
+    #[inline]
     fn from_ordinal(ordinal: usize) -> Option<Self> {
-        if ordinal < Self::ORDINAL_SIZE {
-            Some((ordinal as isize + i16::MIN as isize) as i16)
-        } else {
-            None
-        }
+        i16::MIN.checked_add_unsigned(u16::try_from(ordinal).ok()?)
+    }
+}
+
+/// Accessing this type is compile time error on 32-bit platforms.
+impl Ordinal for u32 {
+    const ORDINAL_SIZE: usize = ordinal_size_sum([u32::MAX as usize, 1]);
+
+    #[inline]
+    fn ordinal(&self) -> usize {
+        const { Self::ORDINAL_SIZE };
+        *self as usize
+    }
+
+    #[inline]
+    fn from_ordinal(ordinal: usize) -> Option<Self> {
+        u32::try_from(ordinal).ok()
+    }
+}
+
+impl Ordinal for i32 {
+    const ORDINAL_SIZE: usize = u32::ORDINAL_SIZE;
+
+    #[inline]
+    fn ordinal(&self) -> usize {
+        const { Self::ORDINAL_SIZE };
+        self.abs_diff(i32::MIN) as usize
+    }
+
+    #[inline]
+    fn from_ordinal(ordinal: usize) -> Option<Self> {
+        const { Self::ORDINAL_SIZE };
+        i32::MIN.checked_add_unsigned(u32::try_from(ordinal).ok()?)
     }
 }
 
@@ -99,5 +132,26 @@ mod tests {
     #[test]
     fn test_i16() {
         test_ordinal::<i16>(i16::MIN..=i16::MAX);
+    }
+
+    #[test]
+    fn test_u32() {
+        if cfg!(target_pointer_width = "64") {
+            let mut iter = crate::Iter::<u32>::new();
+            assert_eq!(u32::MAX as usize + 1, iter.len());
+            assert_eq!(Some(0), iter.next());
+            assert_eq!(Some(1), iter.next());
+            assert_eq!(Some(u32::MAX), iter.next_back());
+        }
+    }
+
+    #[test]
+    fn test_i32() {
+        if cfg!(target_pointer_width = "64") {
+            let mut iter = crate::Iter::<i32>::new();
+            assert_eq!(u32::MAX as usize + 1, iter.len());
+            assert_eq!(Some(i32::MIN), iter.next());
+            assert_eq!(Some(i32::MAX), iter.next_back());
+        }
     }
 }

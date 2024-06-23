@@ -102,6 +102,12 @@ impl<T: Ordinal> Set64<T> {
     }
 }
 
+impl<T: Ordinal> Default for Set64<T> {
+    fn default() -> Self {
+        Set64::new()
+    }
+}
+
 impl<T: Ordinal> FromIterator<T> for Set64<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut set = Set64::new();

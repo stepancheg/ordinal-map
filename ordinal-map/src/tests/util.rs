@@ -8,6 +8,22 @@ use quickcheck::Gen;
 use crate as ordinal_map;
 use crate::Ordinal;
 
+pub(crate) fn test_ordinal_value<T: Ordinal + Eq + Debug>(value: T) {
+    let ordinal = value.ordinal();
+    assert_eq!(value, T::from_ordinal(ordinal).unwrap());
+}
+
+pub(crate) fn test_ordinal_some<T: Ordinal + Eq + Debug>() {
+    if T::ORDINAL_SIZE > 0 {
+        test_ordinal_value(T::from_ordinal(0).unwrap());
+        test_ordinal_value(T::from_ordinal(T::ORDINAL_SIZE - 1).unwrap());
+    }
+    assert!(T::from_ordinal(T::ORDINAL_SIZE).is_none());
+    if T::ORDINAL_SIZE < usize::MAX {
+        assert!(T::from_ordinal(usize::MAX).is_none());
+    }
+}
+
 pub(crate) fn test_ordinal<T: Ordinal + Ord + Eq + Debug>(expected: impl IntoIterator<Item = T>) {
     let expected = Vec::from_iter(expected);
 
@@ -26,9 +42,11 @@ pub(crate) fn test_ordinal<T: Ordinal + Ord + Eq + Debug>(expected: impl IntoIte
     }
 
     assert_eq!(None, T::from_ordinal(T::ORDINAL_SIZE));
+
+    test_ordinal_some::<T>();
 }
 
-#[derive(Ordinal, Eq, PartialEq, Copy, Clone, Debug, Ord, PartialOrd)]
+#[derive(Ordinal, Eq, PartialEq, Hash, Copy, Clone, Debug, Ord, PartialOrd)]
 pub(crate) enum Example4 {
     A,
     B,

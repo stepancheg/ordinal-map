@@ -26,7 +26,7 @@ impl<T: Ordinal> Iterator for Iter<T> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let next = self.range.next()?;
-        T::from_ordinal(next)
+        Some(T::from_ordinal(next).unwrap())
     }
 
     #[inline]
@@ -39,5 +39,13 @@ impl<T: Ordinal> ExactSizeIterator for Iter<T> {
     #[inline]
     fn len(&self) -> usize {
         self.range.len()
+    }
+}
+
+impl<T: Ordinal> DoubleEndedIterator for Iter<T> {
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        let next = self.range.next_back()?;
+        Some(T::from_ordinal(next).unwrap())
     }
 }
