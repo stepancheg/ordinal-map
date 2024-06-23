@@ -35,3 +35,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo doc --no-deps
+
+  check-readme:
+    name: check README.md
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install cargo-readme
+      - run: cargo readme --project-root ordinal-map > README.md.new
+      # If the diff is non-empty, the build will fail.
+      - run: diff -u README.md README.md.new
