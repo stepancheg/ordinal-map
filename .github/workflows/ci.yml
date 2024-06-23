@@ -27,3 +27,11 @@ jobs:
         with:
           components: rustfmt
       - run: cargo fmt -- --check
+
+  cargo-doc:
+    name: cargo doc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo doc --no-deps
