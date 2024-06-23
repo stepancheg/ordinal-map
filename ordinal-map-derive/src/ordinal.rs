@@ -155,7 +155,6 @@ fn struct_ordinal<'a>(
         }
     }
 
-    // TODO: check size.
     let expr = struct_ordinal_impl(
         field_expr_refs.into_iter().collect::<Vec<_>>().as_slice(),
         field_types.into_iter().collect::<Vec<_>>().as_slice(),
