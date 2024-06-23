@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 use std::fmt::Debug;
 use std::marker::PhantomData;
+use std::mem;
 use std::ops::Index;
 use std::ops::IndexMut;
 use std::slice;
@@ -120,7 +121,11 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
         self.map
     }
 
-    // TODO: add insert
+    /// Insert a value into the map, returning the previous value.
+    #[inline]
+    pub fn insert(&mut self, key: K, value: V) -> V {
+        mem::replace(&mut self.map[key.ordinal()], value)
+    }
 }
 
 impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalTotalArrayMap<K, V, S> {
