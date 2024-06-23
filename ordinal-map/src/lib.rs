@@ -9,8 +9,8 @@
 //! # Example
 //!
 //! ```
-//! use ordinal_map::map::OrdinalInitMap;
 //! use ordinal_map::map::OrdinalMap;
+//! use ordinal_map::map::OrdinalTotalMap;
 //! #[derive(ordinal_map::Ordinal)]
 //! enum ErrorCategory {
 //!     Network,
@@ -23,7 +23,7 @@
 //! #  ErrorCategory::Network
 //! }
 //!
-//! let mut error_counts: OrdinalInitMap<ErrorCategory, u64> = OrdinalInitMap::default();
+//! let mut error_counts: OrdinalTotalMap<ErrorCategory, u64> = OrdinalTotalMap::default();
 //!
 //! # let errors = [""; 0];
 //!

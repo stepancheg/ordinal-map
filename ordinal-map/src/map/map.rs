@@ -9,10 +9,10 @@ use crate::map::iter::Keys;
 use crate::map::iter::Values;
 use crate::map::iter::ValuesMut;
 use crate::map::Entry;
-use crate::map::InitIntoIter;
-use crate::map::InitIter;
-use crate::map::InitIterMut;
 use crate::map::IntoIter;
+use crate::map::TotalIntoIter;
+use crate::map::TotalIter;
+use crate::map::TotalIterMut;
 use crate::Ordinal;
 
 /// Map [`Ordinal`](crate::Ordinal) keys to values.
@@ -96,13 +96,13 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     /// Iterate over the map.
     #[inline]
     pub fn iter(&self) -> Iter<K, V> {
-        Iter::new(InitIter::new(self.map.iter(), 0))
+        Iter::new(TotalIter::new(self.map.iter(), 0))
     }
 
     /// Iterate over the map mutably.
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<K, V> {
-        IterMut::new(InitIterMut::new(self.map.iter_mut()))
+        IterMut::new(TotalIterMut::new(self.map.iter_mut()))
     }
 
     /// Iterate over the keys of the map.
@@ -126,7 +126,7 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     /// Clears the map, returning all key-value pairs as an iterator.
     #[inline]
     pub fn drain(&mut self) -> Drain<K, V> {
-        Drain::new(InitIterMut::new(self.map.iter_mut()))
+        Drain::new(TotalIterMut::new(self.map.iter_mut()))
     }
 
     /// Remove all elements from the map.
@@ -174,7 +174,7 @@ impl<K: Ordinal, V> IntoIterator for OrdinalMap<K, V> {
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter::new(InitIntoIter::new(self.map.into_vec().into_iter()))
+        IntoIter::new(TotalIntoIter::new(self.map.into_vec().into_iter()))
     }
 }
 

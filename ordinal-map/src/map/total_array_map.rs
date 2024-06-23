@@ -6,19 +6,19 @@ use std::ops::IndexMut;
 use std::slice;
 
 use crate::array_builder::ArrayBuilder;
-use crate::map::init_iter::InitIntoIterArray;
-use crate::map::InitIter;
-use crate::map::InitIterMut;
+use crate::map::total_iter::TotalIntoIterArray;
+use crate::map::TotalIter;
+use crate::map::TotalIterMut;
 use crate::Ordinal;
 
-/// Like [`InitMap`](crate::map::OrdinalInitMap), but without heap allocation.
+/// Like [`InitMap`](crate::map::OrdinalTotalMap), but without heap allocation.
 ///
 /// Due to limitations of stable Rust, ordinal size must be passed as a third type parameter.
 ///
 /// # Example
 ///
 /// ```
-/// use ordinal_map::map::OrdinalInitArrayMap;
+/// use ordinal_map::map::OrdinalTotalArrayMap;
 /// use ordinal_map::Ordinal;
 ///
 /// #[derive(Ordinal, Debug)]
@@ -28,18 +28,18 @@ use crate::Ordinal;
 ///     Blue,
 /// }
 ///
-/// let map: OrdinalInitArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
-///     OrdinalInitArrayMap::new(|color| format!("{color:?}").to_lowercase());
+/// let map: OrdinalTotalArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
+///     OrdinalTotalArrayMap::new(|color| format!("{color:?}").to_lowercase());
 ///
 /// assert_eq!("green", map[Color::Green]);
 /// ```
 #[repr(C)]
-pub struct OrdinalInitArrayMap<K, V, const S: usize> {
+pub struct OrdinalTotalArrayMap<K, V, const S: usize> {
     map: [V; S],
     _phantom: PhantomData<K>,
 }
 
-impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     const ASSERT: () = {
         assert!(K::ORDINAL_SIZE == S, "K::ORDINAL_SIZE != S");
     };
@@ -51,7 +51,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
         for v in crate::Iter::<K>::new() {
             a.push(init(v)?);
         }
-        Ok(OrdinalInitArrayMap {
+        Ok(OrdinalTotalArrayMap {
             map: a.finish(),
             _phantom: PhantomData,
         })
@@ -83,13 +83,13 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
     }
 
     /// Iterate over the map.
-    pub fn iter<'a>(&'a self) -> InitIter<'a, K, V> {
-        InitIter::new(self.map.iter(), 0)
+    pub fn iter<'a>(&'a self) -> TotalIter<'a, K, V> {
+        TotalIter::new(self.map.iter(), 0)
     }
 
     /// Iterate over the map mutably.
-    pub fn iter_mut<'a>(&'a mut self) -> InitIterMut<'a, K, V> {
-        InitIterMut::new(self.map.iter_mut())
+    pub fn iter_mut<'a>(&'a mut self) -> TotalIterMut<'a, K, V> {
+        TotalIterMut::new(self.map.iter_mut())
     }
 
     /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.
@@ -99,7 +99,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
 
     /// Convert the map into an iterator over keys.
     ///
-    /// This operation is identical to [`keys`](OrdinalInitArrayMap::keys),
+    /// This operation is identical to [`keys`](OrdinalTotalArrayMap::keys),
     /// but added here for consistency with other map implementations.
     pub fn into_keys(self) -> crate::Iter<K> {
         self.keys()
@@ -123,7 +123,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
     // TODO: add insert
 }
 
-impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalInitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalTotalArrayMap<K, V, S> {
     type Output = V;
 
     fn index(&self, index: K) -> &Self::Output {
@@ -131,7 +131,7 @@ impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalInitArrayMap<K, V, S> {
     }
 }
 
-impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, V, S> {
+impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalTotalArrayMap<K, V, S> {
     type Output = V;
 
     fn index(&self, index: &'a K) -> &Self::Output {
@@ -139,45 +139,45 @@ impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, 
     }
 }
 
-impl<K: Ordinal, V, const S: usize> IndexMut<K> for OrdinalInitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> IndexMut<K> for OrdinalTotalArrayMap<K, V, S> {
     fn index_mut(&mut self, index: K) -> &mut Self::Output {
         &mut self.map[index.ordinal()]
     }
 }
 
-impl<'a, K: Ordinal, V, const S: usize> IndexMut<&'a K> for OrdinalInitArrayMap<K, V, S> {
+impl<'a, K: Ordinal, V, const S: usize> IndexMut<&'a K> for OrdinalTotalArrayMap<K, V, S> {
     fn index_mut(&mut self, index: &'a K) -> &mut Self::Output {
         &mut self.map[index.ordinal()]
     }
 }
 
-impl<K, V: Clone, const S: usize> Clone for OrdinalInitArrayMap<K, V, S> {
+impl<K, V: Clone, const S: usize> Clone for OrdinalTotalArrayMap<K, V, S> {
     fn clone(&self) -> Self {
-        OrdinalInitArrayMap {
+        OrdinalTotalArrayMap {
             map: self.map.clone(),
             _phantom: PhantomData,
         }
     }
 }
 
-impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalInitArrayMap<K, V, S> {
+impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalTotalArrayMap<K, V, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_map().entries(self.iter()).finish()
     }
 }
 
-impl<K: Ordinal, V, const S: usize> IntoIterator for OrdinalInitArrayMap<K, V, S> {
+impl<K: Ordinal, V, const S: usize> IntoIterator for OrdinalTotalArrayMap<K, V, S> {
     type Item = (K, V);
-    type IntoIter = InitIntoIterArray<K, V, S>;
+    type IntoIter = TotalIntoIterArray<K, V, S>;
 
     fn into_iter(self) -> Self::IntoIter {
-        InitIntoIterArray::new(self.map.into_iter())
+        TotalIntoIterArray::new(self.map.into_iter())
     }
 }
 
-impl<'a, K: Ordinal, V, const S: usize> IntoIterator for &'a OrdinalInitArrayMap<K, V, S> {
+impl<'a, K: Ordinal, V, const S: usize> IntoIterator for &'a OrdinalTotalArrayMap<K, V, S> {
     type Item = (K, &'a V);
-    type IntoIter = InitIter<'a, K, V>;
+    type IntoIter = TotalIter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()

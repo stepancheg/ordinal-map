@@ -3,21 +3,21 @@ use std::fmt::Formatter;
 use std::marker::PhantomData;
 use std::mem;
 
-use crate::map::init_iter::InitIntoIterArray;
-use crate::map::InitIntoIter;
-use crate::map::InitIter;
-use crate::map::InitIterMut;
+use crate::map::total_iter::TotalIntoIterArray;
+use crate::map::TotalIntoIter;
+use crate::map::TotalIter;
+use crate::map::TotalIterMut;
 use crate::Ordinal;
 
 /// Iterator over the entries of
 /// [`OrdinalMap`](crate::map::OrdinalMap) and [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct Iter<'a, K, V> {
-    iter: InitIter<'a, K, Option<V>>,
+    iter: TotalIter<'a, K, Option<V>>,
 }
 
 impl<'a, K, V> Iter<'a, K, V> {
     #[inline]
-    pub(crate) fn new(iter: InitIter<'a, K, Option<V>>) -> Self {
+    pub(crate) fn new(iter: TotalIter<'a, K, Option<V>>) -> Self {
         Iter { iter }
     }
 }
@@ -71,12 +71,12 @@ impl<'a, K: Ordinal + Debug, V: Debug> Debug for Iter<'a, K, V> {
 /// Iterator over mutable references to the entries of
 /// [`OrdinalMap`](crate::map::OrdinalMap) and [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct IterMut<'a, K, V> {
-    iter: InitIterMut<'a, K, Option<V>>,
+    iter: TotalIterMut<'a, K, Option<V>>,
 }
 
 impl<'a, K: Ordinal, V> IterMut<'a, K, V> {
     #[inline]
-    pub(crate) fn new(iter: InitIterMut<'a, K, Option<V>>) -> Self {
+    pub(crate) fn new(iter: TotalIterMut<'a, K, Option<V>>) -> Self {
         IterMut { iter }
     }
 
@@ -269,11 +269,11 @@ impl<'a, K: Ordinal + Debug, V: Debug> Debug for ValuesMut<'a, K, V> {
 /// Iterator that removes all key-value pairs from [`OrdinalMap`](crate::map::OrdinalMap)
 /// or [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct Drain<'a, K: Ordinal, V> {
-    iter: InitIterMut<'a, K, Option<V>>,
+    iter: TotalIterMut<'a, K, Option<V>>,
 }
 
 impl<'a, K: Ordinal, V> Drain<'a, K, V> {
-    pub(crate) fn new(iter: InitIterMut<'a, K, Option<V>>) -> Self {
+    pub(crate) fn new(iter: TotalIterMut<'a, K, Option<V>>) -> Self {
         Drain { iter }
     }
 }
@@ -312,15 +312,15 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Drain<'a, K, V> {
     }
 }
 
-/// Iterator created from [`OrdinalInitArrayMap`](crate::map::OrdinalInitArrayMap).
+/// Iterator created from [`OrdinalInitArrayMap`](crate::map::OrdinalTotalArrayMap).
 pub struct IntoIterArray<K, V, const S: usize> {
-    iter: InitIntoIterArray<K, Option<V>, S>,
+    iter: TotalIntoIterArray<K, Option<V>, S>,
     _phantom: PhantomData<K>,
 }
 
 impl<K: Ordinal, V, const S: usize> IntoIterArray<K, V, S> {
     #[inline]
-    pub(crate) fn new(iter: InitIntoIterArray<K, Option<V>, S>) -> Self {
+    pub(crate) fn new(iter: TotalIntoIterArray<K, Option<V>, S>) -> Self {
         IntoIterArray {
             iter,
             _phantom: PhantomData,
@@ -375,11 +375,11 @@ impl<K, V: Clone, const S: usize> Clone for IntoIterArray<K, V, S> {
 
 /// Iterator created from [`OrdinalMap`](crate::map::OrdinalMap).
 pub struct IntoIter<K, V> {
-    iter: InitIntoIter<K, Option<V>>,
+    iter: TotalIntoIter<K, Option<V>>,
 }
 
 impl<K, V> IntoIter<K, V> {
-    pub(crate) fn new(iter: InitIntoIter<K, Option<V>>) -> Self {
+    pub(crate) fn new(iter: TotalIntoIter<K, Option<V>>) -> Self {
         IntoIter { iter }
     }
 

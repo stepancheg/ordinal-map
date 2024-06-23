@@ -1,11 +1,11 @@
 use std::fmt;
 use std::fmt::Debug;
 
-use crate::map::init_array_map::OrdinalInitArrayMap;
 use crate::map::iter::IntoIterArray;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::map::iter::ValuesMut;
+use crate::map::total_array_map::OrdinalTotalArrayMap;
 use crate::map::Drain;
 use crate::map::Entry;
 use crate::map::Keys;
@@ -33,7 +33,7 @@ use crate::Ordinal;
 /// map.insert(Weather::Rainy, "it depends");
 /// ```
 pub struct OrdinalArrayMap<K, V, const S: usize> {
-    map: OrdinalInitArrayMap<K, Option<V>, S>,
+    map: OrdinalTotalArrayMap<K, Option<V>, S>,
 }
 
 impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
@@ -41,7 +41,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
     #[inline]
     pub fn new() -> Self {
         OrdinalArrayMap {
-            map: OrdinalInitArrayMap::new(|_| None),
+            map: OrdinalTotalArrayMap::new(|_| None),
         }
     }
 
