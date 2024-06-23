@@ -27,6 +27,7 @@ pub(crate) fn derive_ordinal(
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     let check_overflow = check_overflow();
+    let check_zero_size = check_zero_size();
 
     Ok(syn::parse_quote_spanned! { span =>
         impl #impl_generics ordinal_map::Ordinal for #ident #ty_generics #where_clause {
@@ -37,7 +38,10 @@ pub(crate) fn derive_ordinal(
                 #index_expr
             }
 
+            // For empty types where after check for zero, code is unreachable.
+            #[allow(unreachable_code)]
             fn from_ordinal(index: usize) -> std::option::Option<Self> {
+                #check_zero_size
                 #from_index_expr
             }
         }
@@ -48,6 +52,16 @@ fn check_overflow() -> syn::Stmt {
     syn::parse_quote! {
         // Make sure multiplication doesn't overflow.
         let _check_overflow = Self::ORDINAL_SIZE;
+    }
+}
+
+fn check_zero_size() -> syn::Stmt {
+    syn::parse_quote! {
+        // - Make sure multiplication doesn't overflow by accessing the field
+        // - Make sure we don't divide by zero in the implementation body
+        if Self::ORDINAL_SIZE == 0 {
+            return None;
+        }
     }
 }
 
@@ -180,7 +194,6 @@ fn struct_from_ordinal<'a>(
     });
     for (field_var, field_ty) in field_vars.iter().zip(&field_types).rev() {
         let field_ordinal_size = ordinal_size(field_ty);
-        // TODO: handle zero.
         stmts.extend([
             syn::parse_quote_spanned! { field_var.span() =>
                 let #field_var = <#field_ty as ordinal_map::Ordinal>::from_ordinal(
@@ -441,6 +454,7 @@ fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
         |exprs| syn::parse_quote! { ( #( #exprs, )* ) },
     )?;
     let check_overflow = check_overflow();
+    let check_zero_size = check_zero_size();
     Ok(syn::parse_quote! {
         impl< #( #params: ordinal_map::Ordinal, )* > ordinal_map::Ordinal for ( #( #params, )* ) {
             const ORDINAL_SIZE: usize = #ordinal_size;
@@ -451,6 +465,7 @@ fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
             }
 
             fn from_ordinal(index: usize) -> std::option::Option<Self> {
+                #check_zero_size
                 #from_ordinal
             }
         }

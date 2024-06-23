@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use std::convert::Infallible;
+
 use crate as ordinal_map;
 use crate::Ordinal;
 
@@ -57,9 +59,15 @@ enum MixedEnum {
     C { a: Result<bool, ()>, b: Option<()> },
 }
 
+#[derive(Ordinal, Eq, PartialEq, Debug, Ord, PartialOrd)]
+struct EmptyStruct {
+    _infallible: Infallible,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::tests::derive::EmptyEnum;
+    use crate::tests::derive::EmptyStruct;
     use crate::tests::derive::MixedEnum;
     use crate::tests::derive::RecordEnum;
     use crate::tests::derive::RecordStruct1;
@@ -171,5 +179,10 @@ mod tests {
                 b: Some(()),
             },
         ]);
+    }
+
+    #[test]
+    fn test_empty_struct() {
+        test_ordinal::<EmptyStruct>([]);
     }
 }
