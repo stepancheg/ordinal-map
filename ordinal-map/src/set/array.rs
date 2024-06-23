@@ -76,7 +76,16 @@ impl<T: Ordinal, const S: usize> FromIterator<T> for OrdinalArraySet<T, S> {
     }
 }
 
-impl<T: Ordinal + Debug> Debug for OrdinalArraySet<T, 1> {
+impl<T, const S: usize> Clone for OrdinalArraySet<T, S> {
+    fn clone(&self) -> Self {
+        OrdinalArraySet {
+            words: self.words,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<T: Ordinal + Debug, const S: usize> Debug for OrdinalArraySet<T, S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         Debug::fmt(&self.as_ref(), f)
     }

@@ -9,6 +9,7 @@ use crate::set::set_mut::OrdinalSetMut;
 use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
+#[derive(Clone)]
 enum SetImpl {
     Small(u64),
     Large(Box<[u64]>),
@@ -22,7 +23,7 @@ enum SetImpl {
 /// This map allocates memory when the number of elements is greater than 64.
 /// When the number of elements is known to be less than or equal to 64,
 /// consider using [`Set64`](crate::set::OrdinalSet64) instead.
-pub struct OrdinalSet<T: Ordinal> {
+pub struct OrdinalSet<T> {
     set: SetImpl,
     _phantom: PhantomData<T>,
 }
@@ -98,6 +99,15 @@ impl<T: Ordinal> FromIterator<T> for OrdinalSet<T> {
             set.insert(ordinal);
         }
         set
+    }
+}
+
+impl<T> Clone for OrdinalSet<T> {
+    fn clone(&self) -> Self {
+        OrdinalSet {
+            set: self.set.clone(),
+            _phantom: PhantomData,
+        }
     }
 }
 

@@ -70,8 +70,8 @@ impl<T: Ordinal + Debug> Debug for Iter64<T> {
 ///
 /// This is implemented using a single `u64` value to store the set of elements.
 /// To store set of arbitrary size, consider using [`OrdinalSet`](crate::set::OrdinalSet).
-#[derive(Clone, Eq, PartialEq)]
-pub struct OrdinalSet64<T: Ordinal> {
+#[derive(Eq, PartialEq)]
+pub struct OrdinalSet64<T> {
     set: u64,
     _phantom: PhantomData<T>,
 }
@@ -145,6 +145,15 @@ impl<T: Ordinal> FromIterator<T> for OrdinalSet64<T> {
             set.set |= 1 << ordinal.ordinal();
         }
         set
+    }
+}
+
+impl<T> Clone for OrdinalSet64<T> {
+    fn clone(&self) -> Self {
+        OrdinalSet64 {
+            set: self.set,
+            _phantom: PhantomData,
+        }
     }
 }
 
