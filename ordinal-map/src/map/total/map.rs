@@ -6,9 +6,9 @@ use std::ops::Index;
 use std::ops::IndexMut;
 use std::slice;
 
-use crate::map::total::iter::TotalIter;
-use crate::map::total::iter::TotalIterMut;
-use crate::map::total::TotalIntoIter;
+use crate::map::total::iter::Iter;
+use crate::map::total::IntoIter;
+use crate::map::total::IterMut;
 use crate::Ordinal;
 
 /// Map implementation where all values must be initialized at creation.
@@ -85,14 +85,14 @@ impl<K: Ordinal, V> OrdinalTotalMap<K, V> {
 
     /// Iterate over the map.
     #[inline]
-    pub fn iter<'a>(&'a self) -> TotalIter<'a, K, V> {
-        TotalIter::new(self.map.iter(), 0)
+    pub fn iter<'a>(&'a self) -> Iter<'a, K, V> {
+        Iter::new(self.map.iter(), 0)
     }
 
     /// Iterate over the map mutably.
     #[inline]
-    pub fn iter_mut<'a>(&'a mut self) -> TotalIterMut<'a, K, V> {
-        TotalIterMut::new(self.map.iter_mut())
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, K, V> {
+        IterMut::new(self.map.iter_mut())
     }
 
     // TODO: add insert
@@ -149,16 +149,16 @@ impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalTotalMap<K, V> {
 
 impl<K: Ordinal, V> IntoIterator for OrdinalTotalMap<K, V> {
     type Item = (K, V);
-    type IntoIter = TotalIntoIter<K, V>;
+    type IntoIter = IntoIter<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        TotalIntoIter::new(self.map.into_vec().into_iter())
+        IntoIter::new(self.map.into_vec().into_iter())
     }
 }
 
 impl<'a, K: Ordinal, V> IntoIterator for &'a OrdinalTotalMap<K, V> {
     type Item = (K, &'a V);
-    type IntoIter = TotalIter<'a, K, V>;
+    type IntoIter = Iter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()

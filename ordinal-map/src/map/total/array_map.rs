@@ -6,9 +6,9 @@ use std::ops::IndexMut;
 use std::slice;
 
 use crate::array_builder::ArrayBuilder;
-use crate::map::total::iter::TotalIntoIterArray;
-use crate::map::total::TotalIter;
-use crate::map::total::TotalIterMut;
+use crate::map::total::IntoIterArray;
+use crate::map::total::Iter;
+use crate::map::total::IterMut;
 use crate::Ordinal;
 
 /// Like [`InitMap`](crate::map::total::OrdinalTotalMap), but without heap allocation.
@@ -83,13 +83,13 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     }
 
     /// Iterate over the map.
-    pub fn iter<'a>(&'a self) -> TotalIter<'a, K, V> {
-        TotalIter::new(self.map.iter(), 0)
+    pub fn iter<'a>(&'a self) -> Iter<'a, K, V> {
+        Iter::new(self.map.iter(), 0)
     }
 
     /// Iterate over the map mutably.
-    pub fn iter_mut<'a>(&'a mut self) -> TotalIterMut<'a, K, V> {
-        TotalIterMut::new(self.map.iter_mut())
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, K, V> {
+        IterMut::new(self.map.iter_mut())
     }
 
     /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.
@@ -168,16 +168,16 @@ impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalTotalArrayMa
 
 impl<K: Ordinal, V, const S: usize> IntoIterator for OrdinalTotalArrayMap<K, V, S> {
     type Item = (K, V);
-    type IntoIter = TotalIntoIterArray<K, V, S>;
+    type IntoIter = IntoIterArray<K, V, S>;
 
     fn into_iter(self) -> Self::IntoIter {
-        TotalIntoIterArray::new(self.map.into_iter())
+        IntoIterArray::new(self.map.into_iter())
     }
 }
 
 impl<'a, K: Ordinal, V, const S: usize> IntoIterator for &'a OrdinalTotalArrayMap<K, V, S> {
     type Item = (K, &'a V);
-    type IntoIter = TotalIter<'a, K, V>;
+    type IntoIter = Iter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()

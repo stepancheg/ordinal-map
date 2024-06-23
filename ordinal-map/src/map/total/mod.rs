@@ -5,7 +5,8 @@ pub(crate) mod iter;
 pub(crate) mod map;
 
 pub use crate::map::total::array_map::OrdinalTotalArrayMap;
-pub use crate::map::total::iter::TotalIntoIter;
-pub use crate::map::total::iter::TotalIter;
-pub use crate::map::total::iter::TotalIterMut;
+pub use crate::map::total::iter::IntoIter;
+pub use crate::map::total::iter::IntoIterArray;
+pub use crate::map::total::iter::Iter;
+pub use crate::map::total::iter::IterMut;
 pub use crate::map::total::map::OrdinalTotalMap;
