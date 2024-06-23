@@ -122,6 +122,15 @@ impl<K: Ordinal, V> FromIterator<(K, V)> for OrdinalMap<K, V> {
     }
 }
 
+impl<K, V: Clone> Clone for OrdinalMap<K, V> {
+    fn clone(&self) -> Self {
+        OrdinalMap {
+            map: self.map.clone(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
 impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalMap<K, V> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.iter()).finish()

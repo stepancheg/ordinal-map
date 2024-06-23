@@ -111,7 +111,15 @@ impl<K: Ordinal, V, const S: usize> FromIterator<(K, V)> for OrdinalArrayMap<K, 
     }
 }
 
-impl<K: Ordinal + Debug, V: Debug> Debug for OrdinalArrayMap<K, V, 1> {
+impl<K: Ordinal, V: Clone, const S: usize> Clone for OrdinalArrayMap<K, V, S> {
+    fn clone(&self) -> Self {
+        OrdinalArrayMap {
+            map: self.map.clone(),
+        }
+    }
+}
+
+impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalArrayMap<K, V, S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.iter()).finish()
     }

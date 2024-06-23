@@ -122,6 +122,15 @@ impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalInitArrayMap<K, 
     }
 }
 
+impl<K, V: Clone, const S: usize> Clone for OrdinalInitArrayMap<K, V, S> {
+    fn clone(&self) -> Self {
+        OrdinalInitArrayMap {
+            map: self.map.clone(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
 impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalInitArrayMap<K, V, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_map().entries(self.iter()).finish()
