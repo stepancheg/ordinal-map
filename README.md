@@ -10,7 +10,7 @@ that use these types as keys efficiently.
 ## Example
 
 ```rust
-use ordinal_map::map::OrdinalInitMap;
+use ordinal_map::map::total::OrdinalTotalMap;
 use ordinal_map::map::OrdinalMap;
 #[derive(ordinal_map::Ordinal)]
 enum ErrorCategory {
@@ -23,7 +23,7 @@ fn classify_error(error: &str) -> ErrorCategory {
     // ...
 }
 
-let mut error_counts: OrdinalInitMap<ErrorCategory, u64> = OrdinalInitMap::default();
+let mut error_counts: OrdinalTotalMap<ErrorCategory, u64> = OrdinalTotalMap::default();
 
 
 for error in &errors {

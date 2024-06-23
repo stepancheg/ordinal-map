@@ -11,7 +11,7 @@ use crate::map::total::TotalIter;
 use crate::map::total::TotalIterMut;
 use crate::Ordinal;
 
-/// Like [`InitMap`](crate::map::OrdinalTotalMap), but without heap allocation.
+/// Like [`InitMap`](crate::map::total::OrdinalTotalMap), but without heap allocation.
 ///
 /// Due to limitations of stable Rust, ordinal size must be passed as a third type parameter.
 ///

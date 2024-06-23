@@ -312,7 +312,7 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for Drain<'a, K, V> {
     }
 }
 
-/// Iterator created from [`OrdinalInitArrayMap`](crate::map::OrdinalTotalArrayMap).
+/// Iterator created from [`OrdinalInitArrayMap`](crate::map::total::OrdinalTotalArrayMap).
 pub struct IntoIterArray<K, V, const S: usize> {
     iter: TotalIntoIterArray<K, Option<V>, S>,
     _phantom: PhantomData<K>,

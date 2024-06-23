@@ -15,7 +15,7 @@ use crate::Ordinal;
 ///
 /// This version of map allocates values on the heap in a single contiguous block.
 /// For a version that doesn't require heap allocation,
-/// see [`InitArrayMap`](crate::map::OrdinalTotalArrayMap).
+/// see [`InitArrayMap`](crate::map::total::OrdinalTotalArrayMap).
 pub struct OrdinalTotalMap<T, V> {
     map: Box<[V]>,
     _phantom: PhantomData<T>,

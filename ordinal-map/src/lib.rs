@@ -1,5 +1,7 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 #![deny(missing_docs)]
+// For cargo-rdme.
+#![allow(rustdoc::redundant_explicit_links)]
 
 //! The library provides [`Ordinal`](crate::Ordinal) trait to map types to `usize` values,
 //! proc-macro to derive `Ordinal` trait for structs and enums,
