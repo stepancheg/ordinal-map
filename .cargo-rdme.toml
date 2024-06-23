@@ -1,0 +1,6 @@
+readme-path = "README.md"
+workspace-project = "ordinal-map"
+
+[intralinks]
+# Does not work correctly
+strip-links = true

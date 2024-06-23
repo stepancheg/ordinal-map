@@ -42,7 +42,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo install cargo-readme
-      - run: cargo readme --project-root ordinal-map > README.md.new
-      # If the diff is non-empty, the build will fail.
-      - run: diff -u README.md README.md.new
+      - run: cargo install cargo-rdme
+      - run: cargo rdme --check
