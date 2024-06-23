@@ -96,6 +96,14 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
         crate::Iter::<K>::new()
     }
 
+    /// Convert the map into an iterator over keys.
+    ///
+    /// This operation is identical to [`keys`](OrdinalInitArrayMap::keys),
+    /// but added here for consistency with other map implementations.
+    pub fn into_keys(self) -> crate::Iter<K> {
+        self.keys()
+    }
+
     /// Iterate values of the map.
     pub fn values<'a>(&'a self) -> slice::Iter<'a, V> {
         self.map.iter()
@@ -104,6 +112,11 @@ impl<K: Ordinal, V, const S: usize> OrdinalInitArrayMap<K, V, S> {
     /// Iterate mutable references to values of the map.
     pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
+    }
+
+    /// Convert the map into an array of values.
+    pub fn into_values(self) -> [V; S] {
+        self.map
     }
 }
 

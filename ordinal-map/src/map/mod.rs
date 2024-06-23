@@ -13,6 +13,7 @@ pub use init::OrdinalInitMap;
 pub use init_array::OrdinalInitArrayMap;
 pub use init_iter::InitIter;
 pub use init_iter::InitIterMut;
+pub use iter::Drain;
 pub use iter::Iter;
 pub use iter::IterMut;
 pub use iter::Keys;

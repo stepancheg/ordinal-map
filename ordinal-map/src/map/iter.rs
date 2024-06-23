@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::fmt::Formatter;
+use std::mem;
 
 use crate::map::InitIter;
 use crate::map::InitIterMut;
@@ -259,5 +260,51 @@ impl<'a, K: Ordinal, V> DoubleEndedIterator for ValuesMut<'a, K, V> {
 impl<'a, K: Ordinal + Debug, V: Debug> Debug for ValuesMut<'a, K, V> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
+    }
+}
+
+/// Iterator that removes all key-value pairs from [`OrdinalMap`](crate::map::OrdinalMap)
+/// or [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
+pub struct Drain<'a, K: Ordinal, V> {
+    iter: InitIterMut<'a, K, Option<V>>,
+}
+
+impl<'a, K: Ordinal, V> Drain<'a, K, V> {
+    pub(crate) fn new(iter: InitIterMut<'a, K, Option<V>>) -> Self {
+        Drain { iter }
+    }
+}
+
+impl<'a, K: Ordinal, V> Drop for Drain<'a, K, V> {
+    fn drop(&mut self) {
+        for _ in self {}
+    }
+}
+
+impl<'a, K: Ordinal, V> Iterator for Drain<'a, K, V> {
+    type Item = (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next()?;
+            if let Some(v) = mem::take(v) {
+                return Some((k, v));
+            }
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.iter.len()))
+    }
+}
+
+impl<'a, K: Ordinal, V> DoubleEndedIterator for Drain<'a, K, V> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        loop {
+            let (k, v) = self.iter.next_back()?;
+            if let Some(v) = mem::take(v) {
+                return Some((k, v));
+            }
+        }
     }
 }

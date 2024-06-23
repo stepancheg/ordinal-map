@@ -81,7 +81,7 @@ pub struct InitIterMut<'a, K, V> {
     _phantom: PhantomData<K>,
 }
 
-impl<'a, K, V> InitIterMut<'a, K, V> {
+impl<'a, K: Ordinal, V> InitIterMut<'a, K, V> {
     #[inline]
     pub(crate) fn new(iter: slice::IterMut<'a, V>) -> Self {
         InitIterMut {

@@ -62,6 +62,11 @@ impl<K: Ordinal, V> OrdinalInitMap<K, V> {
         crate::Iter::<K>::new()
     }
 
+    /// Iterate values of the map, which is equivalent to iterating all possible values of `K`.
+    pub fn into_keys(self) -> crate::Iter<K> {
+        crate::Iter::<K>::new()
+    }
+
     /// Iterate values of the map.
     pub fn values<'a>(&'a self) -> slice::Iter<'a, V> {
         self.map.iter()
@@ -70,6 +75,11 @@ impl<K: Ordinal, V> OrdinalInitMap<K, V> {
     /// Iterate mutable references to values of the map.
     pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
+    }
+
+    /// Obtain the values from the map.
+    pub fn into_values(self) -> Box<[V]> {
+        self.map
     }
 
     /// Iterate over the map.

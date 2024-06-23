@@ -2,6 +2,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
+use crate::map::iter::Drain;
 use crate::map::iter::Iter;
 use crate::map::iter::IterMut;
 use crate::map::iter::Keys;
@@ -19,6 +20,7 @@ use crate::Ordinal;
 /// on the first insertion. For non-allocating map, consider using
 /// [`OrdinalArrayMap`](crate::map::OrdinalArrayMap).
 pub struct OrdinalMap<K, V> {
+    // Empty when the map is just created.
     map: Box<[Option<V>]>,
     _phantom: PhantomData<K>,
 }
@@ -102,6 +104,18 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     #[inline]
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
         ValuesMut::new(self.iter_mut())
+    }
+
+    /// Clears the map, returning all key-value pairs as an iterator.
+    #[inline]
+    pub fn drain(&mut self) -> Drain<K, V> {
+        Drain::new(InitIterMut::new(self.map.iter_mut()))
+    }
+
+    /// Remove all elements from the map.
+    #[inline]
+    pub fn clear(&mut self) {
+        self.drain();
     }
 }
 
