@@ -1,11 +1,14 @@
 use std::marker::PhantomData;
+use std::slice;
 
+use crate::set::set_mut::OrdinalSetMut;
+use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
 /// Iterator over elements of [`OrdinalSet`].
 pub struct Iter<'a, T> {
     iter: crate::Iter<T>,
-    set: OrdinalMapRef<'a, T>,
+    set: OrdinalSetRef<'a, T>,
 }
 
 impl<'a, T: Ordinal> Iterator for Iter<'a, T> {
@@ -41,23 +44,6 @@ enum SetImpl {
     Large(Box<[u64]>),
 }
 
-impl SetImpl {}
-
-struct OrdinalMapRef<'a, T> {
-    words: &'a [u64],
-    _phantom: PhantomData<T>,
-}
-
-impl<'a, T: Ordinal> OrdinalMapRef<'a, T> {
-    #[inline]
-    fn contains(&self, ordinal: &T) -> bool {
-        let Some(word) = self.words.get(ordinal.ordinal() / u64::BITS as usize) else {
-            return false;
-        };
-        word & (1 << (ordinal.ordinal() % u64::BITS as usize)) != 0
-    }
-}
-
 /// Default set implementation.
 ///
 /// All operations are constant time
@@ -88,16 +74,10 @@ impl<T: Ordinal> OrdinalSet<T> {
     }
 
     #[inline]
-    fn slice_set(&self) -> OrdinalMapRef<T> {
+    fn as_ref(&self) -> OrdinalSetRef<T> {
         match (Self::IS_SMALL, &self.set) {
-            (true, SetImpl::Small(set)) => OrdinalMapRef {
-                words: std::slice::from_ref(set),
-                _phantom: PhantomData,
-            },
-            (false, SetImpl::Large(set)) => OrdinalMapRef {
-                words: set,
-                _phantom: PhantomData,
-            },
+            (true, SetImpl::Small(set)) => OrdinalSetRef::new(slice::from_ref(set)),
+            (false, SetImpl::Large(set)) => OrdinalSetRef::new(set),
             _ => unreachable!(),
         }
     }
@@ -105,17 +85,14 @@ impl<T: Ordinal> OrdinalSet<T> {
     /// Check if the set contains an element.
     #[inline]
     pub fn contains(&self, ordinal: &T) -> bool {
-        self.slice_set().contains(ordinal)
+        self.as_ref().contains(ordinal)
     }
 
     /// Insert an element into the set, returning `true` if the element was not already present.
     #[inline]
     pub fn insert(&mut self, ordinal: T) -> bool {
-        let r = !self.contains(&ordinal);
         match (Self::IS_SMALL, &mut self.set) {
-            (true, SetImpl::Small(set)) => {
-                *set |= 1 << ordinal.ordinal();
-            }
+            (true, SetImpl::Small(set)) => OrdinalSetMut::new(slice::from_mut(set)).insert(ordinal),
             (false, SetImpl::Large(set)) => {
                 if set.is_empty() {
                     *set = vec![
@@ -125,12 +102,10 @@ impl<T: Ordinal> OrdinalSet<T> {
                     ]
                     .into_boxed_slice();
                 }
-                set[ordinal.ordinal() / u64::BITS as usize] |=
-                    1 << (ordinal.ordinal() % u64::BITS as usize);
+                OrdinalSetMut::new(set).insert(ordinal)
             }
             _ => unreachable!(),
         }
-        r
     }
 
     /// Iterate over the elements of the set.
@@ -138,7 +113,7 @@ impl<T: Ordinal> OrdinalSet<T> {
     pub fn iter(&self) -> Iter<T> {
         Iter {
             iter: crate::Iter::<T>::new(),
-            set: self.slice_set(),
+            set: self.as_ref(),
         }
     }
 }
