@@ -9,14 +9,24 @@ pub(crate) fn derive_ordinal(
 
     let ident = input.ident;
 
+    let from_ordinal_ordinal_var = format_ident!("ordinal");
+
     let (size, index_expr, from_index_expr) = match input.data {
         syn::Data::Struct(s) => {
             let s = StructGen { s };
-            (s.ordinal_size()?, s.ordinal()?, s.from_ordinal()?)
+            (
+                s.ordinal_size()?,
+                s.ordinal()?,
+                s.from_ordinal(&from_ordinal_ordinal_var)?,
+            )
         }
         syn::Data::Enum(e) => {
             let e = EnumGen { e };
-            (e.ordinal_size()?, e.ordinal()?, e.from_ordinal()?)
+            (
+                e.ordinal_size()?,
+                e.ordinal()?,
+                e.from_ordinal(&from_ordinal_ordinal_var)?,
+            )
         }
         syn::Data::Union(_) => {
             return Err(syn::Error::new(
@@ -42,7 +52,7 @@ pub(crate) fn derive_ordinal(
 
             // For empty types where after check for zero, code is unreachable.
             #[allow(unreachable_code)]
-            fn from_ordinal(index: usize) -> std::option::Option<Self> {
+            fn from_ordinal(#from_ordinal_ordinal_var: usize) -> std::option::Option<Self> {
                 #check_zero_size
                 #from_index_expr
             }
@@ -246,12 +256,12 @@ impl StructGen {
         )
     }
 
-    /// Generate `fn from_ordinal(index: usize) -> Option<Self>` body.
-    fn from_ordinal(&self) -> syn::Result<syn::Expr> {
+    /// Generate `fn from_ordinal(ordinal: usize) -> Option<Self>` body.
+    fn from_ordinal(&self, ordinal_var: &syn::Ident) -> syn::Result<syn::Expr> {
         let field_types: Vec<_> = field_types(&self.s.fields).collect();
         let field_vars: Vec<_> = field_vars(&self.s.fields).collect();
         struct_from_ordinal(
-            &syn::parse_quote_spanned! { self.s.struct_token.span => index },
+            &syn::parse_quote_spanned! { ordinal_var.span() => #ordinal_var },
             field_vars.iter().cloned(),
             field_types,
             self.s.struct_token.span,
@@ -359,13 +369,13 @@ impl EnumGen {
         })
     }
 
-    fn from_ordinal(&self) -> syn::Result<syn::Expr> {
+    fn from_ordinal(&self, ordinal_var: &syn::Ident) -> syn::Result<syn::Expr> {
         let mut stmts: Vec<syn::Stmt> = Vec::new();
         for (i, variant) in self.e.variants.iter().enumerate() {
             let size_of_first_variants_before = self.size_of_first_variants(i)?;
             let size_of_first_variants_including = self.size_of_first_variants(i + 1)?;
             let rem_ordinal = syn::parse_quote_spanned! { variant.span() =>
-                index - #size_of_first_variants_before
+                #ordinal_var - #size_of_first_variants_before
             };
             let variant_name = &variant.ident;
             let struct_from_ordinal = struct_from_ordinal(
@@ -391,7 +401,7 @@ impl EnumGen {
             )?;
             stmts.push(syn::parse_quote_spanned! {
                 variant.span() =>
-                if index < #size_of_first_variants_including {
+                if #ordinal_var < #size_of_first_variants_including {
                     return #struct_from_ordinal;
                 }
             })
@@ -399,7 +409,7 @@ impl EnumGen {
         Ok(syn::parse_quote_spanned! { self.e.enum_token.span =>
             {
                 #( #stmts )*
-                let _ignore = index;
+                let _ignore = #ordinal_var;
                 std::option::Option::None
             }
         })
@@ -407,6 +417,7 @@ impl EnumGen {
 }
 
 fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
+    let ordinal_var = format_ident!("ordinal");
     let params: Vec<_> = (0..n)
         .map(|i| format_ident!("{}", char::try_from('A' as u32 + i).unwrap()))
         .collect();
@@ -427,7 +438,7 @@ fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
         proc_macro2::Span::call_site(),
     )?;
     let from_ordinal = struct_from_ordinal(
-        &syn::parse_quote! { index },
+        &syn::parse_quote_spanned! { ordinal_var.span() => #ordinal_var },
         vars,
         &field_types,
         proc_macro2::Span::call_site(),
@@ -444,7 +455,7 @@ fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
                 #ordinal
             }
 
-            fn from_ordinal(index: usize) -> std::option::Option<Self> {
+            fn from_ordinal(#ordinal_var: usize) -> std::option::Option<Self> {
                 #check_zero_size
                 #from_ordinal
             }
