@@ -9,13 +9,15 @@ pub(crate) fn derive_ordinal(
 
     let ident = input.ident;
 
-    let ImplMembers {
-        size,
-        ordinal: index_expr,
-        from_ordinal: from_index_expr,
-    } = match input.data {
-        syn::Data::Struct(s) => StructGen { s }.gen()?,
-        syn::Data::Enum(e) => EnumGen { e }.gen()?,
+    let (size, index_expr, from_index_expr) = match input.data {
+        syn::Data::Struct(s) => {
+            let s = StructGen { s };
+            (s.ordinal_size()?, s.ordinal()?, s.from_ordinal()?)
+        }
+        syn::Data::Enum(e) => {
+            let e = EnumGen { e };
+            (e.ordinal_size()?, e.ordinal()?, e.from_ordinal()?)
+        }
         syn::Data::Union(_) => {
             return Err(syn::Error::new(
                 span,
@@ -63,12 +65,6 @@ fn check_zero_size() -> syn::Stmt {
             return None;
         }
     }
-}
-
-struct ImplMembers {
-    size: syn::Expr,
-    ordinal: syn::Expr,
-    from_ordinal: syn::Expr,
 }
 
 fn field_vars(fields: &syn::Fields) -> impl Iterator<Item = syn::Ident> + '_ {
@@ -280,14 +276,6 @@ impl StructGen {
             },
         )
     }
-
-    fn gen(&self) -> syn::Result<ImplMembers> {
-        Ok(ImplMembers {
-            size: self.ordinal_size()?,
-            ordinal: self.ordinal()?,
-            from_ordinal: self.from_ordinal()?,
-        })
-    }
 }
 
 struct EnumGen {
@@ -414,14 +402,6 @@ impl EnumGen {
                 let _ignore = index;
                 std::option::Option::None
             }
-        })
-    }
-
-    fn gen(&self) -> syn::Result<ImplMembers> {
-        Ok(ImplMembers {
-            size: self.ordinal_size()?,
-            ordinal: self.ordinal()?,
-            from_ordinal: self.from_ordinal()?,
         })
     }
 }
