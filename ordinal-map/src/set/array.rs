@@ -17,7 +17,7 @@ pub const fn ordinal_array_set_s<T: Ordinal>() -> usize {
 /// # Size parameter
 ///
 /// Parameter `S` must be explicitly specified as
-/// [`ordinal_array_set_s::<T>()`](crate::set::ordinal_array_set_size)
+/// [`ordinal_array_set_s::<T>()`](ordinal_array_set_s)
 /// due to limitations of const generics in stable Rust.
 ///
 /// If this is not convenient, consider using:

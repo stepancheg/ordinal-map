@@ -11,7 +11,6 @@ that use these types as keys efficiently.
 
 ```rust
 use ordinal_map::map::total::OrdinalTotalMap;
-use ordinal_map::map::OrdinalMap;
 #[derive(ordinal_map::Ordinal)]
 enum ErrorCategory {
     Network,
