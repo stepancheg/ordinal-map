@@ -9,6 +9,7 @@ documentation = "https://docs.rs/ordinal-map"
 keywords = ["map", "set", "ordinal", "enum", "integer"]
 license = "MIT"
 repository = "https://github.com/stepancheg/ordinal-map"
+readme = "../README.md"
 
 [dependencies]
 ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.0" }
