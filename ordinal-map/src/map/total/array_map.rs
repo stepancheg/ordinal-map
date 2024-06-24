@@ -8,6 +8,7 @@ use std::slice;
 
 use crate::array_as_mut::array_as_mut;
 use crate::array_builder::ArrayBuilder;
+use crate::array_from_iter::array_from_iter;
 use crate::map::total::IntoIterArray;
 use crate::map::total::Iter;
 use crate::map::total::IterMut;
@@ -100,6 +101,30 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     /// Return a new map with values as mutable references to values of the original map.
     pub fn as_mut(&mut self) -> OrdinalTotalArrayMap<K, &mut V, S> {
         OrdinalTotalArrayMap::from_array(array_as_mut(&mut self.map))
+    }
+
+    /// Combine two maps into one.
+    pub fn zip<W>(
+        self,
+        other: OrdinalTotalArrayMap<K, W, S>,
+    ) -> OrdinalTotalArrayMap<K, (V, W), S> {
+        OrdinalTotalArrayMap {
+            map: array_from_iter(self.map.into_iter().zip(other.map.into_iter())),
+            _phantom: PhantomData,
+        }
+    }
+
+    /// Map the values of the map.
+    pub fn map<W>(self, mut f: impl FnMut(K, V) -> W) -> OrdinalTotalArrayMap<K, W, S> {
+        OrdinalTotalArrayMap {
+            map: array_from_iter(self.into_iter().map(|(k, v)| f(k, v))),
+            _phantom: PhantomData,
+        }
+    }
+
+    /// Map the values of the map.
+    pub fn map_values<W>(self, mut f: impl FnMut(V) -> W) -> OrdinalTotalArrayMap<K, W, S> {
+        self.map(|_k, v| f(v))
     }
 
     /// Iterate over the map.
