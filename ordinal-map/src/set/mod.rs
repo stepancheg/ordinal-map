@@ -8,6 +8,7 @@ pub(crate) mod set64;
 pub(crate) mod set_mut;
 pub(crate) mod set_ref;
 
+pub use array::ordinal_array_set_s;
 pub use array::OrdinalArraySet;
 pub use iter::Iter;
 pub use set::OrdinalSet;

@@ -6,23 +6,40 @@ use crate::set::set_mut::OrdinalSetMut;
 use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
+/// Compute the size of `S` parameter for [`OrdinalArraySet`](crate::set::OrdinalArraySet).
+/// This is simply `(T::ORDINAL_SIZE + 63) / 64`.
+pub const fn ordinal_array_set_s<T: Ordinal>() -> usize {
+    (T::ORDINAL_SIZE + u64::BITS as usize - 1) / u64::BITS as usize
+}
+
 /// Set of ordinals implemented as an array of words.
 ///
 /// # Size parameter
 ///
-/// Parameter `S` must be explicitly specified as `(T::ORDINAL_SIZE + 63) / 64`
+/// Parameter `S` must be explicitly specified as
+/// [`ordinal_array_set_s::<T>()`](crate::set::ordinal_array_set_size)
 /// due to limitations of const generics in stable Rust.
 ///
 /// If this is not convenient, consider using:
 /// - [`OrdinalSet64`](crate::set::OrdinalSet64) for types where `T::ORDINAL_SIZE <= 64`.
 /// - [`OrdinalSet`](crate::set::OrdinalSet) which allocates storage dynamically.
+///
+/// # Example
+///
+/// ```
+/// use ordinal_map::set::ordinal_array_set_s;
+/// use ordinal_map::set::OrdinalArraySet;
+/// let mut set: OrdinalArraySet<u8, { ordinal_array_set_s::<u8>() }> = OrdinalArraySet::new();
+///
+/// set.insert(17);
+/// ```
 pub struct OrdinalArraySet<T, const S: usize> {
     words: [u64; S],
     _phantom: PhantomData<T>,
 }
 
 impl<T: Ordinal, const S: usize> OrdinalArraySet<T, S> {
-    const ASSERT: () = assert!(S == (T::ORDINAL_SIZE + 63) / 64);
+    const ASSERT: () = assert!(S == ordinal_array_set_s::<T>());
 
     /// Create a new empty set.
     #[inline]
@@ -95,13 +112,13 @@ impl<T: Ordinal + Debug, const S: usize> Debug for OrdinalArraySet<T, S> {
 mod tests {
     use std::collections::HashSet;
 
+    use crate::set::array::ordinal_array_set_s;
     use crate::set::OrdinalArraySet;
-    use crate::Ordinal;
 
     #[quickcheck]
     fn qc_insert(values: Vec<i8>, check: Vec<i8>) {
         let mut control: HashSet<i8> = HashSet::new();
-        let mut set: OrdinalArraySet<i8, { (i8::ORDINAL_SIZE + 63) / 64 }> = OrdinalArraySet::new();
+        let mut set: OrdinalArraySet<i8, { ordinal_array_set_s::<i8>() }> = OrdinalArraySet::new();
 
         for &value in &values {
             assert_eq!(control.insert(value), set.insert(value));

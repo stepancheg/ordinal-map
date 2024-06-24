@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use crate::set::array::ordinal_array_set_s;
 use crate::set::set_ref::OrdinalSetRef;
 use crate::Ordinal;
 
@@ -11,7 +12,7 @@ pub(crate) struct OrdinalSetMut<'a, T> {
 impl<'a, T: Ordinal> OrdinalSetMut<'a, T> {
     #[inline]
     pub(crate) fn new(words: &'a mut [u64]) -> Self {
-        debug_assert!(words.len() == (T::ORDINAL_SIZE + 63) / 64);
+        debug_assert!(words.len() == ordinal_array_set_s::<T>());
         OrdinalSetMut {
             words,
             _phantom: PhantomData,

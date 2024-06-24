@@ -2,6 +2,7 @@ use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::marker::PhantomData;
 
+use crate::set::array::ordinal_array_set_s;
 use crate::set::Iter;
 use crate::Ordinal;
 
@@ -18,7 +19,7 @@ impl<'a, T: Ordinal> OrdinalSetRef<'a, T> {
 
     #[inline]
     pub(crate) fn new(words: &'a [u64]) -> Self {
-        debug_assert!(words.len() == 0 || words.len() == (T::ORDINAL_SIZE + 63) / 64);
+        debug_assert!(words.len() == 0 || words.len() == ordinal_array_set_s::<T>());
         OrdinalSetRef {
             words,
             _phantom: PhantomData,
