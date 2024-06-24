@@ -32,7 +32,7 @@ use crate::Ordinal;
 /// let map: OrdinalTotalArrayMap<Color, String, { Color::ORDINAL_SIZE }> =
 ///     OrdinalTotalArrayMap::new(|color| format!("{color:?}").to_lowercase());
 ///
-/// assert_eq!("green", map[Color::Green]);
+/// assert_eq!("green", map[&Color::Green]);
 /// ```
 #[repr(C)]
 pub struct OrdinalTotalArrayMap<K, V, const S: usize> {
@@ -128,25 +128,11 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     }
 }
 
-impl<K: Ordinal, V, const S: usize> Index<K> for OrdinalTotalArrayMap<K, V, S> {
-    type Output = V;
-
-    fn index(&self, index: K) -> &Self::Output {
-        &self.map[index.ordinal()]
-    }
-}
-
 impl<'a, K: Ordinal, V, const S: usize> Index<&'a K> for OrdinalTotalArrayMap<K, V, S> {
     type Output = V;
 
     fn index(&self, index: &'a K) -> &Self::Output {
         &self.map[index.ordinal()]
-    }
-}
-
-impl<K: Ordinal, V, const S: usize> IndexMut<K> for OrdinalTotalArrayMap<K, V, S> {
-    fn index_mut(&mut self, index: K) -> &mut Self::Output {
-        &mut self.map[index.ordinal()]
     }
 }
 

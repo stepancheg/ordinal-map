@@ -29,7 +29,7 @@
 //! # let errors = [""; 0];
 //! for error in &errors {
 //!     let category = classify_error(error);
-//!     error_counts[category] += 1;
+//!     error_counts[&category] += 1;
 //! }
 //! ```
 

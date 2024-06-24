@@ -109,25 +109,11 @@ impl<K: Ordinal, V: Default> Default for OrdinalTotalMap<K, V> {
     }
 }
 
-impl<K: Ordinal, V> Index<K> for OrdinalTotalMap<K, V> {
-    type Output = V;
-
-    fn index(&self, key: K) -> &Self::Output {
-        self.get(&key)
-    }
-}
-
 impl<'a, K: Ordinal, V> Index<&'a K> for OrdinalTotalMap<K, V> {
     type Output = V;
 
     fn index(&self, key: &'a K) -> &Self::Output {
         self.get(key)
-    }
-}
-
-impl<K: Ordinal, V> IndexMut<K> for OrdinalTotalMap<K, V> {
-    fn index_mut(&mut self, key: K) -> &mut Self::Output {
-        self.get_mut(&key)
     }
 }
 
