@@ -108,6 +108,7 @@ impl Ordinal for i32 {
 #[cfg(test)]
 mod tests {
     use crate::tests::util::test_ordinal;
+    use crate::Ordinal;
 
     #[test]
     fn test_bool() {
@@ -137,7 +138,7 @@ mod tests {
     #[test]
     fn test_u32() {
         if cfg!(target_pointer_width = "64") {
-            let mut iter = crate::Iter::<u32>::new();
+            let mut iter = u32::all_values();
             assert_eq!(u32::MAX as usize + 1, iter.len());
             assert_eq!(Some(0), iter.next());
             assert_eq!(Some(1), iter.next());
@@ -148,7 +149,7 @@ mod tests {
     #[test]
     fn test_i32() {
         if cfg!(target_pointer_width = "64") {
-            let mut iter = crate::Iter::<i32>::new();
+            let mut iter = i32::all_values();
             assert_eq!(u32::MAX as usize + 1, iter.len());
             assert_eq!(Some(i32::MIN), iter.next());
             assert_eq!(Some(i32::MAX), iter.next_back());

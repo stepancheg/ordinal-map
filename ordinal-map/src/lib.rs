@@ -28,7 +28,6 @@
 //! let mut error_counts: OrdinalTotalMap<ErrorCategory, u64> = OrdinalTotalMap::default();
 //!
 //! # let errors = [""; 0];
-//!
 //! for error in &errors {
 //!     let category = classify_error(error);
 //!     error_counts[category] += 1;
@@ -40,13 +39,13 @@
 extern crate quickcheck_macros;
 
 pub mod __macro_refs;
-mod iter;
 pub mod map;
 mod ordinal;
 pub mod set;
 pub(crate) mod tests;
+mod values;
 
-pub use iter::Iter;
 pub use ordinal::traits::Ordinal;
 pub use ordinal_map_derive::Ordinal;
+pub use values::OrdinalValues;
 pub(crate) mod array_builder;

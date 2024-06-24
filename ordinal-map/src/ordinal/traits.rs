@@ -1,4 +1,9 @@
-/// Type that can be converted to `usize` range from `0..ORDINAL_SIZE`.
+/// Two-way map from a type to `usize` range from `0..ORDINAL_SIZE`.
+///
+/// Two way ordinal mapping means:
+/// - the type has `ORDINAL_SIZE` possible values
+/// - each value has a unique ordinal number in the range `0..ORDINAL_SIZE`
+/// - each ordinal number corresponds to a unique value
 ///
 /// This type is implemented for
 /// - small integer types
@@ -9,7 +14,10 @@
 /// # Relation to `Ord` and `PartialOrd`
 ///
 /// Implementations provided in this crate and generated with `#[derive(Ordinal)]`
-/// are compatible with `Ord` and `PartialOrd`, meaning `a < b <=> a.ordinal() < b.ordinal()`.
+/// are compatible with `Ord` and `PartialOrd`, meaning `a < b <=> a.ordinal() < b.ordinal()`
+/// **with the exception** of derive on enums with explicit discriminants
+/// (derive ignores them and assigns ordinal numbers in order of declaration).
+///
 /// This is not enforced by the trait itself, but it is a good practice to follow.
 ///
 /// # Derive
@@ -45,7 +53,7 @@
 ///
 /// # See also
 ///
-/// - [`Iter`](crate::Iter) to iterate over all possible values.
+/// - [`Iter`](crate::OrdinalValues) to iterate over all possible values.
 /// - [`map`](crate::map) module for constant time lookup maps.
 /// - [`set`](crate::set) module for constant time lookup sets.
 pub trait Ordinal: Sized {
@@ -57,4 +65,20 @@ pub trait Ordinal: Sized {
     fn ordinal(&self) -> usize;
     /// Returns the ordinal from the index.
     fn from_ordinal(ordinal: usize) -> Option<Self>;
+
+    /// Iterate over all possible values.
+    ///
+    /// Values are returned in order of their ordinal numbers.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use ordinal_map::Ordinal;
+    /// let mut iter = i16::all_values();
+    /// assert_eq!(Some(i16::MIN), iter.next());
+    /// assert_eq!(Some(i16::MAX), iter.next_back());
+    /// ```
+    fn all_values() -> crate::OrdinalValues<Self> {
+        crate::OrdinalValues::new()
+    }
 }

@@ -33,7 +33,7 @@ pub(crate) fn test_ordinal<T: Ordinal + Ord + Eq + Debug>(expected: impl IntoIte
     }
 
     assert_eq!(expected.len(), T::ORDINAL_SIZE);
-    assert_eq!(expected, crate::Iter::<T>::new().collect::<Vec<_>>());
+    assert_eq!(expected, T::all_values().collect::<Vec<_>>());
 
     for i in 0..T::ORDINAL_SIZE {
         let t = T::from_ordinal(i).unwrap();

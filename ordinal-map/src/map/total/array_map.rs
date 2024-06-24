@@ -49,7 +49,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     pub fn try_new<E>(mut init: impl FnMut(K) -> Result<V, E>) -> Result<Self, E> {
         const { Self::ASSERT };
         let mut a = ArrayBuilder::new();
-        for v in crate::Iter::<K>::new() {
+        for v in K::all_values() {
             a.push(init(v)?);
         }
         Ok(OrdinalTotalArrayMap {
@@ -94,15 +94,15 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     }
 
     /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.
-    pub fn keys(&self) -> crate::Iter<K> {
-        crate::Iter::<K>::new()
+    pub fn keys(&self) -> crate::OrdinalValues<K> {
+        K::all_values()
     }
 
     /// Convert the map into an iterator over keys.
     ///
     /// This operation is identical to [`keys`](OrdinalTotalArrayMap::keys),
     /// but added here for consistency with other map implementations.
-    pub fn into_keys(self) -> crate::Iter<K> {
+    pub fn into_keys(self) -> crate::OrdinalValues<K> {
         self.keys()
     }
 

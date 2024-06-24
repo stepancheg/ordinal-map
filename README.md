@@ -25,7 +25,6 @@ fn classify_error(error: &str) -> ErrorCategory {
 
 let mut error_counts: OrdinalTotalMap<ErrorCategory, u64> = OrdinalTotalMap::default();
 
-
 for error in &errors {
     let category = classify_error(error);
     error_counts[category] += 1;

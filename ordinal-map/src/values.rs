@@ -6,24 +6,34 @@ use std::ops::Range;
 
 use crate::Ordinal;
 
-/// Iterate over all values of an ordinal.
-pub struct Iter<T> {
+/// Iterator over [`Ordinal`] values.
+///
+/// This iterator is created by [`Ordinal::all_values`](Ordinal::all_values).
+///
+/// # Example
+///
+/// ```
+/// use ordinal_map::Ordinal;
+///
+/// assert_eq!(vec![false, true], bool::all_values().collect::<Vec<_>>());
+/// ```
+pub struct OrdinalValues<T> {
     range: Range<usize>,
     _phantom: PhantomData<T>,
 }
 
-impl<T: Ordinal> Iter<T> {
+impl<T: Ordinal> OrdinalValues<T> {
     /// Create a new iterator.
     #[inline]
-    pub fn new() -> Self {
-        Iter {
+    pub(crate) fn new() -> Self {
+        OrdinalValues {
             range: 0..T::ORDINAL_SIZE,
             _phantom: PhantomData,
         }
     }
 }
 
-impl<T: Ordinal> Iterator for Iter<T> {
+impl<T: Ordinal> Iterator for OrdinalValues<T> {
     type Item = T;
 
     #[inline]
@@ -38,14 +48,14 @@ impl<T: Ordinal> Iterator for Iter<T> {
     }
 }
 
-impl<T: Ordinal> ExactSizeIterator for Iter<T> {
+impl<T: Ordinal> ExactSizeIterator for OrdinalValues<T> {
     #[inline]
     fn len(&self) -> usize {
         self.range.len()
     }
 }
 
-impl<T: Ordinal> DoubleEndedIterator for Iter<T> {
+impl<T: Ordinal> DoubleEndedIterator for OrdinalValues<T> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         let next = self.range.next_back()?;
@@ -53,17 +63,17 @@ impl<T: Ordinal> DoubleEndedIterator for Iter<T> {
     }
 }
 
-impl<T> Clone for Iter<T> {
+impl<T> Clone for OrdinalValues<T> {
     #[inline]
     fn clone(&self) -> Self {
-        Iter {
+        OrdinalValues {
             range: self.range.clone(),
             _phantom: PhantomData,
         }
     }
 }
 
-impl<T: Ordinal + Debug> Debug for Iter<T> {
+impl<T: Ordinal + Debug> Debug for OrdinalValues<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut iter = self.clone();
         let Some(first) = iter.next() else {
@@ -82,9 +92,11 @@ impl<T: Ordinal + Debug> Debug for Iter<T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::Ordinal;
+
     #[test]
     fn test_iter_debug() {
-        let mut iter = crate::Iter::<u8>::new();
+        let mut iter = u8::all_values();
         assert_eq!("[0..]", format!("{:?}", iter));
         iter.next().unwrap();
         assert_eq!("[1..]", format!("{:?}", iter));

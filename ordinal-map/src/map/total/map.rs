@@ -26,7 +26,7 @@ impl<K: Ordinal, V> OrdinalTotalMap<K, V> {
     /// Create a new map by initializing each value with a function.
     pub fn try_new<E>(mut init: impl FnMut(K) -> Result<V, E>) -> Result<Self, E> {
         let mut map = Vec::with_capacity(K::ORDINAL_SIZE);
-        for v in crate::Iter::<K>::new() {
+        for v in K::all_values() {
             map.push(init(v)?);
         }
         Ok(OrdinalTotalMap {
@@ -60,13 +60,13 @@ impl<K: Ordinal, V> OrdinalTotalMap<K, V> {
     }
 
     /// Iterate keys of the map, which is equivalent to iterating all possible values of `K`.
-    pub fn keys(&self) -> crate::Iter<K> {
-        crate::Iter::<K>::new()
+    pub fn keys(&self) -> crate::OrdinalValues<K> {
+        K::all_values()
     }
 
     /// Iterate values of the map, which is equivalent to iterating all possible values of `K`.
-    pub fn into_keys(self) -> crate::Iter<K> {
-        crate::Iter::<K>::new()
+    pub fn into_keys(self) -> crate::OrdinalValues<K> {
+        K::all_values()
     }
 
     /// Iterate values of the map.

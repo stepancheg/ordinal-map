@@ -6,7 +6,7 @@ use crate::Ordinal;
 /// Iterator over elements of [`OrdinalSet`](crate::set::OrdinalSet)
 /// or [`OrdinalArraySet`](crate::set::OrdinalArraySet).
 pub struct Iter<'a, T> {
-    iter: crate::Iter<T>,
+    iter: crate::OrdinalValues<T>,
     set: OrdinalSetRef<'a, T>,
 }
 
@@ -14,7 +14,7 @@ impl<'a, T: Ordinal> Iter<'a, T> {
     #[inline]
     pub(crate) fn new(set: OrdinalSetRef<'a, T>) -> Self {
         Iter {
-            iter: crate::Iter::new(),
+            iter: T::all_values(),
             set,
         }
     }
