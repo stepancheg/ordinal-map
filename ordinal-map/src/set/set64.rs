@@ -107,9 +107,9 @@ impl<T: Ordinal> OrdinalSet64<T> {
 
     /// Insert an element into the set, returning `true` if the element was not already present.
     #[inline]
-    pub fn insert(&mut self, ordinal: &T) -> bool {
+    pub fn insert(&mut self, ordinal: T) -> bool {
         const { Self::ASSERT };
-        let r = !self.contains(ordinal);
+        let r = !self.contains(&ordinal);
         self.set |= 1 << ordinal.ordinal();
         r
     }
