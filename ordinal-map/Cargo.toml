@@ -2,6 +2,13 @@
 name = "ordinal-map"
 version = "0.1.0"
 edition = "2021"
+authors = ["Stepan Koltsov <stepan.koltsov@gmail.com>"]
+categories = ["data-structures", "algorithms"]
+description = "Ordinal trait to map values to integers and efficient maps and sets for such types"
+documentation = "https://docs.rs/ordinal-map"
+keywords = ["map", "set", "ordinal", "enum", "integer"]
+license = "MIT"
+repository = "https://github.com/stepancheg/ordinal-map"
 
 [dependencies]
 ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.0" }

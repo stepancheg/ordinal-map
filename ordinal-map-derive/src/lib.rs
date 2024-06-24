@@ -1,3 +1,7 @@
+//! Procedural macros for `ordinal-map` crate.
+//!
+//! This crate does not have a public API, everything is re-exported from `ordinal-map` crate.
+
 mod ordinal;
 
 fn wrapper(
