@@ -67,6 +67,14 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
         }
     }
 
+    /// Create a new map from an array of values in ordinal order of keys.
+    pub fn from_array(array: [V; S]) -> Self {
+        OrdinalTotalArrayMap {
+            map: array,
+            _phantom: PhantomData,
+        }
+    }
+
     /// Returns the number of elements in the map, which is
     /// always equal to [`K::ORDINAL_SIZE`](Ordinal::ORDINAL_SIZE).
     pub const fn len(&self) -> usize {
