@@ -111,9 +111,19 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
         self.map.iter()
     }
 
+    /// Values arrays.
+    pub fn values_array(&self) -> &[V; S] {
+        &self.map
+    }
+
     /// Iterate mutable references to values of the map.
     pub fn values_mut<'a>(&'a mut self) -> slice::IterMut<'a, V> {
         self.map.iter_mut()
+    }
+
+    /// Values arrays.
+    pub fn values_array_mut(&mut self) -> &mut [V; S] {
+        &mut self.map
     }
 
     /// Convert the map into an array of values.
