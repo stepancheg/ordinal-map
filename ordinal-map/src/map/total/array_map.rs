@@ -165,6 +165,12 @@ impl<K, V: Clone, const S: usize> Clone for OrdinalTotalArrayMap<K, V, S> {
     }
 }
 
+impl<K: Ordinal, V: Default, const S: usize> Default for OrdinalTotalArrayMap<K, V, S> {
+    fn default() -> Self {
+        OrdinalTotalArrayMap::new(|_| V::default())
+    }
+}
+
 impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for OrdinalTotalArrayMap<K, V, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_map().entries(self.iter()).finish()
