@@ -1,6 +1,6 @@
 [package]
 name = "ordinal-map"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 authors = ["Stepan Koltsov <stepan.koltsov@gmail.com>"]
 categories = ["data-structures", "algorithms"]
@@ -12,7 +12,7 @@ repository = "https://github.com/stepancheg/ordinal-map"
 readme = "../README.md"
 
 [dependencies]
-ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.4" }
+ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.5" }
 
 [dev-dependencies]
 quickcheck = "1.0.3"
