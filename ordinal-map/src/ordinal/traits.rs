@@ -62,8 +62,28 @@ pub trait Ordinal: Sized {
     /// It is compile-time error if the number of possible values is greater than `usize::MAX`.
     const ORDINAL_SIZE: usize;
     /// Index of the ordinal.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use std::num::NonZeroI16;
+    ///
+    /// use ordinal_map::Ordinal;
+    /// assert_eq!(0, None::<u16>.ordinal());
+    /// assert_eq!(1, Some::<u16>(0).ordinal());
+    /// assert_eq!(2, Some::<u16>(1).ordinal());
+    /// ```
     fn ordinal(&self) -> usize;
     /// Returns the ordinal from the index.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use ordinal_map::Ordinal;
+    ///
+    /// assert_eq!(i16::MIN, i16::from_ordinal(0).unwrap());
+    /// assert_eq!(i16::MIN + 1, i16::from_ordinal(1).unwrap());
+    /// ```
     fn from_ordinal(ordinal: usize) -> Option<Self>;
 
     /// Iterate over all possible values.
