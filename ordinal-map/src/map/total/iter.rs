@@ -9,8 +9,8 @@ use crate::map::enumerate::OrdinalEnumerate;
 use crate::Ordinal;
 
 /// Iterator created from
-/// [`InitMap`](crate::map::total::OrdinalTotalMap) and
-/// [`InitArrayMap`](crate::map::total::OrdinalTotalArrayMap).
+/// [`OrdinalTotalMap`](crate::map::total::OrdinalTotalMap) and
+/// [`OrdinalTotalArrayMap`](crate::map::total::OrdinalTotalArrayMap).
 pub struct Iter<'a, K, V> {
     iter: OrdinalEnumerate<K, slice::Iter<'a, V>>,
 }
@@ -64,8 +64,8 @@ impl<'a, K: Ordinal + Debug, V: Debug> Debug for Iter<'a, K, V> {
 }
 
 /// Mutable iterator created from
-/// [`InitMap`](crate::map::total::OrdinalTotalMap) and
-/// [`InitArrayMap`](crate::map::total::OrdinalTotalArrayMap).
+/// [`OrdinalTotalMap`](crate::map::total::OrdinalTotalMap) and
+/// [`OrdinalTotalArrayMap`](crate::map::total::OrdinalTotalArrayMap).
 pub struct IterMut<'a, K, V> {
     iter: OrdinalEnumerate<K, slice::IterMut<'a, V>>,
 }
@@ -167,7 +167,7 @@ impl<K: Ordinal + Debug, V: Debug, const S: usize> Debug for IntoIterArray<K, V,
     }
 }
 
-/// Iterator created from [`InitMap`](crate::map::total::OrdinalTotalMap).
+/// Iterator created from [`OrdinalTotalMap`](crate::map::total::OrdinalTotalMap).
 pub struct IntoIter<K, V> {
     iter: OrdinalEnumerate<K, vec::IntoIter<V>>,
 }
