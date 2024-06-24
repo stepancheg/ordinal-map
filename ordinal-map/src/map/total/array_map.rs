@@ -6,6 +6,7 @@ use std::ops::Index;
 use std::ops::IndexMut;
 use std::slice;
 
+use crate::array_as_mut::array_as_mut;
 use crate::array_builder::ArrayBuilder;
 use crate::map::total::IntoIterArray;
 use crate::map::total::Iter;
@@ -89,6 +90,16 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
     /// Returns a mutable reference to the value corresponding to the key.
     pub fn get_mut<'a>(&'a mut self, key: &K) -> &'a mut V {
         &mut self.map[key.ordinal()]
+    }
+
+    /// Return a new map with values as references to values of the original map.
+    pub fn as_ref(&self) -> OrdinalTotalArrayMap<K, &V, S> {
+        OrdinalTotalArrayMap::new(|k| self.get(&k))
+    }
+
+    /// Return a new map with values as mutable references to values of the original map.
+    pub fn as_mut(&mut self) -> OrdinalTotalArrayMap<K, &mut V, S> {
+        OrdinalTotalArrayMap::from_array(array_as_mut(&mut self.map))
     }
 
     /// Iterate over the map.
