@@ -46,6 +46,22 @@ impl<T: Ordinal> Iterator for OrdinalValues<T> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.range.size_hint()
     }
+
+    #[inline]
+    fn count(self) -> usize
+    where
+        Self: Sized,
+    {
+        self.range.count()
+    }
+
+    #[inline]
+    fn last(mut self) -> Option<Self::Item>
+    where
+        Self: Sized,
+    {
+        self.next_back()
+    }
 }
 
 impl<T: Ordinal> ExactSizeIterator for OrdinalValues<T> {
@@ -105,5 +121,11 @@ mod tests {
         assert_eq!(254, iter.len());
         iter.nth(252).unwrap();
         assert_eq!("[254]", format!("{:?}", iter));
+    }
+
+    #[test]
+    fn test_last() {
+        let iter = u8::all_values();
+        assert_eq!(Some(255), iter.last());
     }
 }
