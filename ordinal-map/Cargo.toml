@@ -11,8 +11,12 @@ license = "MIT"
 repository = "https://github.com/stepancheg/ordinal-map"
 readme = "../README.md"
 
+[features]
+default = []
+
 [dependencies]
 ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.6" }
+either = { version = "1.15.0", optional = true }
 
 [dev-dependencies]
 quickcheck = "1.0.3"
