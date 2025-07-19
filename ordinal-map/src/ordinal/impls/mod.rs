@@ -1,3 +1,4 @@
+mod array;
 mod either;
 mod non_zero;
 mod primitive;

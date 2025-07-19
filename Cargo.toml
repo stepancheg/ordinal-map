@@ -15,4 +15,5 @@ repository = "https://github.com/stepancheg/ordinal-map"
 [workspace.lints.clippy]
 len_zero = "allow"
 module_inception = "allow"
+question_mark = "allow"
 wrong_self_convention = "allow"
