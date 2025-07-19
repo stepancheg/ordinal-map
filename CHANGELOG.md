@@ -1,4 +1,4 @@
-# 0.1.8 - Unreleased
+# 0.1.8 - 2025-07-19
 
 - `#[allow(clippy::all)]` in generated code
 - `is_empty` functions on maps
