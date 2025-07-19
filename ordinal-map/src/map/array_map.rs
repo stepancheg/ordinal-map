@@ -57,6 +57,11 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
         self.iter().count()
     }
 
+    /// Return true if the map container no elements.
+    pub fn is_empty(&self) -> bool {
+        self.iter().next().is_none()
+    }
+
     /// Look up a value by key.
     #[inline]
     pub fn get<'a>(&'a self, key: &K) -> Option<&'a V> {

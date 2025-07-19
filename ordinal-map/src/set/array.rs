@@ -9,7 +9,7 @@ use crate::Ordinal;
 /// Compute the size of `S` parameter for [`OrdinalArraySet`](crate::set::OrdinalArraySet).
 /// This is simply `(T::ORDINAL_SIZE + 63) / 64`.
 pub const fn ordinal_array_set_s<T: Ordinal>() -> usize {
-    (T::ORDINAL_SIZE + u64::BITS as usize - 1) / u64::BITS as usize
+    T::ORDINAL_SIZE.div_ceil(u64::BITS as usize)
 }
 
 /// Set of ordinals implemented as an array of words.

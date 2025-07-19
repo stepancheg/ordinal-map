@@ -167,12 +167,10 @@ fn struct_ordinal<'a>(
                 let rem_expr = struct_ordinal_impl(rem_exprs, rem_tys, span)?;
                 tuple_2_ordinal(&first_expr, &rem_expr, &rem_count)
             }
-            _ => {
-                return Err(syn::Error::new(
-                    span,
-                    "Mismatched field_expr_refs and field_types",
-                ))
-            }
+            _ => Err(syn::Error::new(
+                span,
+                "Mismatched field_expr_refs and field_types",
+            )),
         }
     }
 

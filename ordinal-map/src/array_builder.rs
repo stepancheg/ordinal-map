@@ -48,7 +48,7 @@ impl<T, const S: usize> ArrayBuilder<T, S> {
             }
             return Err(ArrayNotFilled);
         }
-        let array = unsafe { mem::transmute_copy::<[MaybeUninit<T>; S], [T; S]>(&mut self.array) };
+        let array = unsafe { mem::transmute_copy::<[MaybeUninit<T>; S], [T; S]>(&self.array) };
         mem::forget(self);
         Ok(array)
     }

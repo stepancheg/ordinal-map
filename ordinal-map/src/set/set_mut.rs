@@ -21,7 +21,7 @@ impl<'a, T: Ordinal> OrdinalSetMut<'a, T> {
 
     #[inline]
     fn as_ref(&self) -> OrdinalSetRef<T> {
-        OrdinalSetRef::new(&self.words)
+        OrdinalSetRef::new(self.words)
     }
 
     #[inline]

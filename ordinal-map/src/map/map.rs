@@ -65,6 +65,12 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
         self.iter().count()
     }
 
+    /// Return true if the map container no elements.
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.iter().next().is_none()
+    }
+
     fn init_full_map(&mut self) {
         if self.map.is_empty() {
             let mut map = Vec::with_capacity(K::ORDINAL_SIZE);

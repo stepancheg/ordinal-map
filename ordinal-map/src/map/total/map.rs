@@ -49,6 +49,12 @@ impl<K: Ordinal, V> OrdinalTotalMap<K, V> {
         K::ORDINAL_SIZE
     }
 
+    /// Return true if the map container no elements.
+    /// This is only if `<K>` is empty.
+    pub const fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Returns a reference to the value corresponding to the key.
     pub fn get<'a>(&'a self, key: &K) -> &'a V {
         &self.map[key.ordinal()]

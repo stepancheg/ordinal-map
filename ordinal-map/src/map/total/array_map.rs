@@ -83,6 +83,11 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
         S
     }
 
+    /// Return true if the map container no elements.
+    pub const fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Returns a reference to the value corresponding to the key.
     pub fn get<'a>(&'a self, key: &K) -> &'a V {
         &self.map[key.ordinal()]
@@ -109,7 +114,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalTotalArrayMap<K, V, S> {
         other: OrdinalTotalArrayMap<K, W, S>,
     ) -> OrdinalTotalArrayMap<K, (V, W), S> {
         OrdinalTotalArrayMap {
-            map: array_from_iter(self.map.into_iter().zip(other.map.into_iter())),
+            map: array_from_iter(self.map.into_iter().zip(other.map)),
             _phantom: PhantomData,
         }
     }

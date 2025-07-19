@@ -150,18 +150,14 @@ impl Ordinal for NonZeroIsize {
         if self.get() > 0 {
             usize::MAX / 2 + self.get() as usize
         } else {
-            self.get().abs_diff(isize::MIN) as usize
+            self.get().abs_diff(isize::MIN)
         }
     }
 
     #[inline]
     fn from_ordinal(ordinal: usize) -> Option<Self> {
         match ordinal.checked_sub(isize::MAX as usize + 1) {
-            None => NonZeroIsize::new(
-                isize::MIN
-                    .checked_add_unsigned(usize::try_from(ordinal).unwrap())
-                    .unwrap(),
-            ),
+            None => NonZeroIsize::new(isize::MIN.checked_add_unsigned(ordinal).unwrap()),
             Some(rem) => NonZeroIsize::new(isize::try_from(rem + 1).ok()?),
         }
     }
