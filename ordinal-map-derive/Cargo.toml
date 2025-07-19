@@ -1,14 +1,14 @@
 [package]
 name = "ordinal-map-derive"
-version = "0.1.7"
-edition = "2021"
-authors = ["Stepan Koltsov <stepan.koltsov@gmail.com>"]
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
 categories = ["data-structures", "algorithms"]
 description = "Ordinal trait to map values to integers and efficient maps and sets for such types"
 documentation = "https://docs.rs/ordinal-map"
 keywords = ["map", "set", "ordinal", "enum", "integer"]
-license = "MIT"
-repository = "https://github.com/stepancheg/ordinal-map"
+license = { workspace = true }
+repository = { workspace = true }
 
 [lib]
 proc-macro = true

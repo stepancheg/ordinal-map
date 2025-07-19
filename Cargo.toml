@@ -4,3 +4,10 @@ members = [
     "ordinal-map",
     "ordinal-map-derive",
 ]
+
+[workspace.package]
+version = "0.1.7"
+authors = ["Stepan Koltsov <stepan.koltsov@gmail.com>"]
+license = "MIT"
+edition = "2021"
+repository = "https://github.com/stepancheg/ordinal-map"
