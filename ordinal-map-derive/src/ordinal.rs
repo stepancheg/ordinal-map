@@ -42,6 +42,7 @@ pub(crate) fn derive_ordinal(
     let check_zero_size = check_zero_size();
 
     Ok(syn::parse_quote_spanned! { span =>
+        #[allow(clippy::all)]
         impl #impl_generics ordinal_map::Ordinal for #ident #ty_generics #where_clause {
             const ORDINAL_SIZE: usize = #size;
 
