@@ -1,6 +1,7 @@
 # Unreleased
 
 - `impl Ordinal for Box<T>`
+- `impl Ordinal for Ordering`
 
 # 0.1.8 - 2025-07-19
 
