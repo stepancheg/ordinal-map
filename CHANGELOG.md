@@ -1,8 +1,12 @@
+# Unreleased
+
+- `impl Ordinal for Box<T>`
+
 # 0.1.8 - 2025-07-19
 
 - `#[allow(clippy::all)]` in generated code
 - `is_empty` functions on maps
-- impl `Ordinal` for arrays
+- `impl Ordinal` for arrays
 
 # 0.1.7 - 2025-06-02
 
