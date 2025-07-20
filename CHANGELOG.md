@@ -2,6 +2,7 @@
 
 - `impl Ordinal for Box<T>`
 - `impl Ordinal for Ordering`
+- `impl Ordinal for char`
 
 # 0.1.8 - 2025-07-19
 

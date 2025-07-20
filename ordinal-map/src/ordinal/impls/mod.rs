@@ -1,5 +1,6 @@
 mod array;
 mod boxed;
+mod char;
 mod either;
 mod non_zero;
 mod ordering;
