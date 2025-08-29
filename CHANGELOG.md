@@ -15,3 +15,5 @@
 - Specialize `.last()` and `.count()` for `OrdinalValues`
 - Add `either` feature
 
+# 0.1.9 - 2025-08-29
+- add `AtomicOrdinal`

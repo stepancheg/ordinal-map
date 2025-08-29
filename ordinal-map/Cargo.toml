@@ -15,7 +15,7 @@ readme = "../README.md"
 default = []
 
 [dependencies]
-ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.8" }
+ordinal-map-derive = { path = "../ordinal-map-derive", version = "=0.1.9" }
 either = { version = "1.15.0", optional = true }
 
 [dev-dependencies]

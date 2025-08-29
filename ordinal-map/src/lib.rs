@@ -40,12 +40,14 @@ extern crate quickcheck_macros;
 pub mod __macro_refs;
 pub(crate) mod array_as_mut;
 pub(crate) mod array_from_iter;
+mod atomic;
 pub mod map;
 mod ordinal;
 pub mod set;
 pub(crate) mod tests;
 mod values;
 
+pub use atomic::AtomicOrdinal;
 pub use ordinal::traits::Ordinal;
 pub use ordinal_map_derive::Ordinal;
 pub use values::OrdinalValues;
