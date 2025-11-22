@@ -78,7 +78,7 @@ impl<'a, K: Ordinal, V> IterMut<'a, K, V> {
         }
     }
 
-    pub(crate) fn iter(&self) -> Iter<K, V> {
+    pub(crate) fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(self.iter.iter.as_slice().iter(), self.iter.next)
     }
 }
@@ -126,7 +126,7 @@ impl<K, V, const S: usize> IntoIterArray<K, V, S> {
         }
     }
 
-    pub(crate) fn iter(&self) -> Iter<K, V> {
+    pub(crate) fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(self.iter.iter.as_slice().iter(), self.iter.next)
     }
 }
@@ -180,7 +180,7 @@ impl<K, V> IntoIter<K, V> {
         }
     }
 
-    pub(crate) fn iter(&self) -> Iter<K, V> {
+    pub(crate) fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(self.iter.iter.as_slice().iter(), self.iter.next)
     }
 }

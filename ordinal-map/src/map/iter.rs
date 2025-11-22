@@ -324,7 +324,7 @@ impl<K: Ordinal, V, const S: usize> IntoIterArray<K, V, S> {
         }
     }
 
-    fn iter(&self) -> Iter<K, V> {
+    fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(self.iter.iter())
     }
 }
@@ -380,7 +380,7 @@ impl<K, V> IntoIter<K, V> {
         IntoIter { iter }
     }
 
-    fn iter(&self) -> Iter<K, V> {
+    fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(self.iter.iter())
     }
 }

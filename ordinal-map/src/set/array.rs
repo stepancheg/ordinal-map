@@ -49,13 +49,13 @@ impl<T: Ordinal, const S: usize> OrdinalArraySet<T, S> {
     }
 
     #[inline]
-    fn as_ref(&self) -> OrdinalSetRef<T> {
+    fn as_ref(&self) -> OrdinalSetRef<'_, T> {
         const { Self::ASSERT };
         OrdinalSetRef::new(&self.words)
     }
 
     #[inline]
-    fn as_mut(&mut self) -> OrdinalSetMut<T> {
+    fn as_mut(&mut self) -> OrdinalSetMut<'_, T> {
         const { Self::ASSERT };
         OrdinalSetMut::new(&mut self.words)
     }

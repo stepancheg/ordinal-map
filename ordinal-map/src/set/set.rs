@@ -45,7 +45,7 @@ impl<T: Ordinal> OrdinalSet<T> {
     }
 
     #[inline]
-    fn as_ref(&self) -> OrdinalSetRef<T> {
+    fn as_ref(&self) -> OrdinalSetRef<'_, T> {
         match (Self::IS_SMALL, &self.set) {
             (true, SetImpl::Small(set)) => OrdinalSetRef::new(slice::from_ref(set)),
             (false, SetImpl::Large(set)) => OrdinalSetRef::new(set),
@@ -81,7 +81,7 @@ impl<T: Ordinal> OrdinalSet<T> {
 
     /// Iterate over the elements of the set.
     #[inline]
-    pub fn iter(&self) -> Iter<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         self.as_ref().iter()
     }
 }

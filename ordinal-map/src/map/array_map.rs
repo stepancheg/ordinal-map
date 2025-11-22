@@ -88,7 +88,7 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
 
     /// Get an entry in the map for the given key.
     #[inline]
-    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         let entry = &mut self.map[&key];
         Entry::new(key, entry)
     }
@@ -113,25 +113,25 @@ impl<K: Ordinal, V, const S: usize> OrdinalArrayMap<K, V, S> {
 
     /// Iterate over the keys of the map.
     #[inline]
-    pub fn keys(&self) -> Keys<K, V> {
+    pub fn keys(&self) -> Keys<'_, K, V> {
         Keys::new(self.iter())
     }
 
     /// Iterate over the values of the map.
     #[inline]
-    pub fn values(&self) -> Values<K, V> {
+    pub fn values(&self) -> Values<'_, K, V> {
         Values::new(self.iter())
     }
 
     /// Iterate over the values of the map mutably.
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
         ValuesMut::new(self.iter_mut())
     }
 
     /// Remove all elements from the map.
     #[inline]
-    pub fn drain(&mut self) -> Drain<K, V> {
+    pub fn drain(&mut self) -> Drain<'_, K, V> {
         Drain::new(self.map.iter_mut())
     }
 

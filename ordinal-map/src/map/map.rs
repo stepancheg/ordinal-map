@@ -89,7 +89,7 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
     }
 
     /// Get an entry in the map for the given key.
-    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         self.init_full_map();
         let entry = &mut self.map[key.ordinal()];
         Entry::new(key, entry)
@@ -103,37 +103,37 @@ impl<K: Ordinal, V> OrdinalMap<K, V> {
 
     /// Iterate over the map.
     #[inline]
-    pub fn iter(&self) -> Iter<K, V> {
+    pub fn iter(&self) -> Iter<'_, K, V> {
         Iter::new(total::Iter::new(self.map.iter(), 0))
     }
 
     /// Iterate over the map mutably.
     #[inline]
-    pub fn iter_mut(&mut self) -> IterMut<K, V> {
+    pub fn iter_mut(&mut self) -> IterMut<'_, K, V> {
         IterMut::new(total::IterMut::new(self.map.iter_mut()))
     }
 
     /// Iterate over the keys of the map.
     #[inline]
-    pub fn keys(&self) -> Keys<K, V> {
+    pub fn keys(&self) -> Keys<'_, K, V> {
         Keys::new(self.iter())
     }
 
     /// Iterate over the values of the map.
     #[inline]
-    pub fn values(&self) -> Values<K, V> {
+    pub fn values(&self) -> Values<'_, K, V> {
         Values::new(self.iter())
     }
 
     /// Iterate over the mutable references to the values of the map.
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
         ValuesMut::new(self.iter_mut())
     }
 
     /// Clears the map, returning all key-value pairs as an iterator.
     #[inline]
-    pub fn drain(&mut self) -> Drain<K, V> {
+    pub fn drain(&mut self) -> Drain<'_, K, V> {
         Drain::new(total::IterMut::new(self.map.iter_mut()))
     }
 

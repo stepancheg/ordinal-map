@@ -91,7 +91,7 @@ impl<T: Ordinal> OrdinalSet64<T> {
         }
     }
 
-    fn as_ref(&self) -> OrdinalSetRef<T> {
+    fn as_ref(&self) -> OrdinalSetRef<'_, T> {
         OrdinalSetRef::new(slice::from_ref(&self.set))
     }
 
