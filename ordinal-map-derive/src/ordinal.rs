@@ -15,16 +15,16 @@ pub(crate) fn derive_ordinal(
         syn::Data::Struct(s) => {
             let s = StructGen { s };
             (
-                s.ordinal_size()?,
-                s.ordinal()?,
+                s.ordinal_size()?.expr(),
+                s.ordinal()?.expr(),
                 s.from_ordinal(&from_ordinal_ordinal_var)?,
             )
         }
         syn::Data::Enum(e) => {
             let e = EnumGen { e };
             (
-                e.ordinal_size()?,
-                e.ordinal()?,
+                e.ordinal_size()?.expr(),
+                e.ordinal()?.expr(),
                 e.from_ordinal(&from_ordinal_ordinal_var)?,
             )
         }
@@ -51,8 +51,7 @@ pub(crate) fn derive_ordinal(
                 #index_expr
             }
 
-            // For empty types where after check for zero, code is unreachable.
-            #[allow(unreachable_code)]
+            #[allow(unreachable_code, unused_mut)]
             fn from_ordinal(#from_ordinal_ordinal_var: usize) -> std::option::Option<Self> {
                 #check_zero_size
                 #from_index_expr
@@ -89,15 +88,125 @@ fn field_types(fields: &syn::Fields) -> impl Iterator<Item = &syn::Type> {
     fields.iter().map(|f| &f.ty)
 }
 
-fn ordinal_size(ty: &syn::Type) -> syn::Expr {
-    syn::parse_quote_spanned! { ty.span() =>
-        <#ty as ordinal_map::Ordinal>::ORDINAL_SIZE
-    }
+enum SizeExpr {
+    Const(u64),
+    Syn(syn::Expr),
+    Sum(Vec<SizeExpr>),
+    Product(Vec<SizeExpr>),
 }
 
-fn ordinal_expr(value: &syn::Expr) -> syn::Expr {
-    syn::parse_quote_spanned! { value.span() =>
-        ordinal_map::Ordinal::ordinal(#value)
+impl SizeExpr {
+    fn ordinal_size(ty: &syn::Type) -> SizeExpr {
+        SizeExpr::Syn(syn::parse_quote_spanned! { ty.span() =>
+            <#ty as ordinal_map::Ordinal>::ORDINAL_SIZE
+        })
+    }
+
+    fn ordinal_expr(value: &syn::Expr) -> SizeExpr {
+        SizeExpr::Syn(syn::parse_quote_spanned! { value.span() =>
+            ordinal_map::Ordinal::ordinal(#value)
+        })
+    }
+
+    fn product(exprs: impl IntoIterator<Item = SizeExpr>) -> SizeExpr {
+        fn product_ignore_const(exprs: impl IntoIterator<Item = SizeExpr>) -> SizeExpr {
+            let mut exprs = exprs.into_iter();
+            let Some(first) = exprs.next() else {
+                return SizeExpr::Const(1);
+            };
+            let Some(second) = exprs.next() else {
+                return first;
+            };
+            SizeExpr::Product([first, second].into_iter().chain(exprs).collect())
+        }
+
+        let mut product = 1u64;
+        let mut items = Vec::new();
+        for expr in exprs {
+            match expr {
+                SizeExpr::Const(c) => product = product.checked_mul(c).expect("size overflow"),
+                SizeExpr::Product(xs) => items.extend(xs),
+                s @ (SizeExpr::Syn(_) | SizeExpr::Sum(_)) => items.push(s),
+            }
+        }
+        match product {
+            0 => SizeExpr::Const(0),
+            1 => product_ignore_const(items),
+            c => product_ignore_const([SizeExpr::Const(c)].into_iter().chain(items)),
+        }
+    }
+
+    fn sum(exprs: impl IntoIterator<Item = SizeExpr>) -> SizeExpr {
+        fn sum_ignore_const(exprs: impl IntoIterator<Item = SizeExpr>) -> SizeExpr {
+            let mut exprs = exprs.into_iter();
+            let Some(first) = exprs.next() else {
+                return SizeExpr::Const(0);
+            };
+            let Some(second) = exprs.next() else {
+                return first;
+            };
+            SizeExpr::Sum([first, second].into_iter().chain(exprs).collect())
+        }
+
+        let mut sum = 0u64;
+        let mut items = Vec::new();
+        for expr in exprs {
+            match expr {
+                SizeExpr::Const(c) => sum = sum.checked_add(c).expect("size overflow"),
+                SizeExpr::Sum(xs) => items.extend(xs),
+                s @ (SizeExpr::Syn(_) | SizeExpr::Product(_)) => items.push(s),
+            }
+        }
+        match sum {
+            0 => sum_ignore_const(items),
+            c => sum_ignore_const([SizeExpr::Const(c)].into_iter().chain(items)),
+        }
+    }
+
+    fn expr_const(value: u64) -> syn::Expr {
+        let c = syn::LitInt::new(&format!("{value}usize"), proc_macro2::Span::call_site());
+        syn::parse_quote! { #c }
+    }
+
+    fn expr(&self) -> syn::Expr {
+        match self {
+            SizeExpr::Const(c) => Self::expr_const(*c),
+            SizeExpr::Syn(e) => e.clone(),
+            SizeExpr::Sum(exprs) => {
+                assert!(exprs.len() >= 2);
+                let mut exprs = exprs.iter().map(|e| e.expr());
+                let first = exprs.next().expect("At least one expr");
+                syn::parse_quote! {
+                    (
+                        #first #( + #exprs )*
+                    )
+                }
+            }
+            SizeExpr::Product(exprs) => {
+                assert!(exprs.len() >= 2);
+                let mut exprs = exprs.iter().map(|e| e.expr());
+                let first = exprs.next().expect("At least one expr");
+                syn::parse_quote! {
+                    (
+                        #first #( * #exprs )*
+                    )
+                }
+            }
+        }
+    }
+
+    fn const_expr(&self) -> syn::Expr {
+        match self {
+            SizeExpr::Const(c) => Self::expr_const(*c),
+            e => {
+                let e = e.expr();
+                syn::parse_quote! {
+                    const {
+                        #e
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -105,67 +214,33 @@ struct StructGen {
     s: syn::DataStruct,
 }
 
-fn struct_ordinal_size<'a>(types: impl IntoIterator<Item = &'a syn::Type>) -> syn::Expr {
-    let types = types.into_iter();
-    syn::parse_quote! {
-        const {
-            ordinal_map::__macro_refs::ordinal_size_product([
-                #( <#types as ordinal_map::Ordinal>::ORDINAL_SIZE, )*
-            ])
-        }
-    }
+fn struct_ordinal_size<'a>(types: impl IntoIterator<Item = &'a syn::Type>) -> SizeExpr {
+    SizeExpr::product(types.into_iter().map(SizeExpr::ordinal_size))
 }
 
 fn struct_ordinal<'a>(
     field_expr_refs: impl IntoIterator<Item = &'a syn::Expr>,
     field_types: impl IntoIterator<Item = &'a syn::Type>,
     span: proc_macro2::Span,
-) -> syn::Result<syn::Expr> {
-    fn tuple_count<'b>(counts: impl IntoIterator<Item = &'b syn::Expr>) -> syn::Expr {
-        fn tuple_count_impl(counts: &[&syn::Expr]) -> syn::Expr {
-            match counts {
-                [] => syn::parse_quote! { 1usize },
-                [count] => (*count).clone(),
-                [first, rem @ ..] => {
-                    let rem = tuple_count_impl(rem);
-                    syn::parse_quote_spanned! { first.span() =>
-                        #first * #rem
-                    }
-                }
-            }
-        }
-        tuple_count_impl(&Vec::from_iter(counts))
-    }
-
-    fn tuple_2_ordinal(
-        a: &syn::Expr,
-        b: &syn::Expr,
-        b_count: &syn::Expr,
-    ) -> syn::Result<syn::Expr> {
-        Ok(syn::parse_quote_spanned! { a.span() =>
-            #a * #b_count + #b
-        })
+) -> syn::Result<SizeExpr> {
+    fn tuple_2_ordinal(a: SizeExpr, b: SizeExpr, b_count: SizeExpr) -> SizeExpr {
+        SizeExpr::sum([SizeExpr::product([a, b_count]), b])
     }
 
     fn struct_ordinal_impl(
         field_expr_refs: &[&syn::Expr],
         field_types: &[&syn::Type],
         span: proc_macro2::Span,
-    ) -> syn::Result<syn::Expr> {
+    ) -> syn::Result<SizeExpr> {
         match (field_expr_refs, field_types) {
-            ([], []) => Ok(syn::parse_quote_spanned! { span => 0usize }),
-            ([field_expr], [_]) => Ok(ordinal_expr(field_expr)),
+            ([], []) => Ok(SizeExpr::Const(0)),
+            ([field_expr], [_]) => Ok(SizeExpr::ordinal_expr(field_expr)),
             ([first_expr, rem_exprs @ ..], [_first_ty, rem_tys @ ..]) => {
-                let rem_count = tuple_count(
-                    &rem_tys
-                        .iter()
-                        .copied()
-                        .map(ordinal_size)
-                        .collect::<Vec<_>>(),
-                );
-                let first_expr = ordinal_expr(first_expr);
+                let rem_count =
+                    SizeExpr::product(rem_tys.iter().copied().map(|e| SizeExpr::ordinal_size(e)));
+                let first_expr = SizeExpr::ordinal_expr(first_expr);
                 let rem_expr = struct_ordinal_impl(rem_exprs, rem_tys, span)?;
-                tuple_2_ordinal(&first_expr, &rem_expr, &rem_count)
+                Ok(tuple_2_ordinal(first_expr, rem_expr, rem_count))
             }
             _ => Err(syn::Error::new(
                 span,
@@ -194,11 +269,10 @@ fn struct_from_ordinal<'a>(
 
     let mut stmts: Vec<syn::Stmt> = Vec::new();
     stmts.push(syn::parse_quote_spanned! { span =>
-        #[allow(unused_mut)]
         let mut rem = #ordinal;
     });
     for (field_var, field_ty) in field_vars.iter().zip(&field_types).rev() {
-        let field_ordinal_size = ordinal_size(field_ty);
+        let field_ordinal_size = SizeExpr::ordinal_size(field_ty).const_expr();
         stmts.extend([
             syn::parse_quote_spanned! { field_var.span() =>
                 let #field_var = <#field_ty as ordinal_map::Ordinal>::from_ordinal(
@@ -240,12 +314,12 @@ impl StructGen {
     }
 
     /// Generate `const ORDINAL_SIZE = ` RHS.
-    fn ordinal_size(&self) -> syn::Result<syn::Expr> {
+    fn ordinal_size(&self) -> syn::Result<SizeExpr> {
         Ok(struct_ordinal_size(field_types(&self.s.fields)))
     }
 
     /// Generate `fn ordinal(&self) -> usize` body.
-    fn ordinal(&self) -> syn::Result<syn::Expr> {
+    fn ordinal(&self) -> syn::Result<SizeExpr> {
         let field_types: Vec<_> = field_types(&self.s.fields).collect();
         let field_exprs: Vec<_> = self.field_ref_exprs().collect();
         struct_ordinal(
@@ -292,33 +366,24 @@ struct EnumGen {
 }
 
 impl EnumGen {
-    fn size_of_first_variants(&self, i: usize) -> syn::Result<syn::Expr> {
+    fn size_of_first_variants(&self, i: usize) -> syn::Result<SizeExpr> {
         let sizes = self
             .e
             .variants
             .iter()
             .take(i)
             .map(|v| struct_ordinal_size(v.fields.iter().map(|f| &f.ty)));
-        Ok(syn::parse_quote_spanned! { self.e.enum_token.span =>
-            const {
-                ordinal_map::__macro_refs::ordinal_size_sum([
-                    #( #sizes, )*
-                ])
-            }
-        })
+        Ok(SizeExpr::sum(sizes))
     }
 
-    fn ordinal_size(&self) -> syn::Result<syn::Expr> {
+    fn ordinal_size(&self) -> syn::Result<SizeExpr> {
         self.size_of_first_variants(self.e.variants.len())
     }
 
-    fn ordinal(&self) -> syn::Result<syn::Expr> {
+    fn ordinal(&self) -> syn::Result<SizeExpr> {
         if self.e.variants.is_empty() {
             // Special case because rust doesn't like `match &empty_enum {}`.
-            return Ok(syn::parse_quote_spanned! {
-                self.e.enum_token.span =>
-                0usize
-            });
+            return Ok(SizeExpr::Const(0));
         }
 
         let mut arms: Vec<syn::Arm> = Vec::new();
@@ -353,26 +418,27 @@ impl EnumGen {
                 field_types(&variant.fields),
                 variant.span(),
             )?;
+            let value = SizeExpr::sum([size_of_first_variants, struct_ordinal]).expr();
             arms.push(syn::parse_quote_spanned! {
                 variant.span() =>
                 #bind => {
-                    (#size_of_first_variants) + #struct_ordinal
+                    #value
                 }
             })
         }
-        Ok(syn::parse_quote_spanned! {
+        Ok(SizeExpr::Syn(syn::parse_quote_spanned! {
             self.e.enum_token.span =>
             match self {
                 #( #arms, )*
             }
-        })
+        }))
     }
 
     fn from_ordinal(&self, ordinal_var: &syn::Ident) -> syn::Result<syn::Expr> {
         let mut stmts: Vec<syn::Stmt> = Vec::new();
         for (i, variant) in self.e.variants.iter().enumerate() {
-            let size_of_first_variants_before = self.size_of_first_variants(i)?;
-            let size_of_first_variants_including = self.size_of_first_variants(i + 1)?;
+            let size_of_first_variants_before = self.size_of_first_variants(i)?.const_expr();
+            let size_of_first_variants_including = self.size_of_first_variants(i + 1)?.const_expr();
             let rem_ordinal = syn::parse_quote_spanned! { variant.span() =>
                 #ordinal_var - #size_of_first_variants_before
             };
@@ -430,12 +496,13 @@ fn impl_ordinal_for_tuple_n(n: u32) -> syn::Result<syn::ItemImpl> {
             syn::parse_quote! { &self.#i }
         })
         .collect();
-    let ordinal_size = struct_ordinal_size(&field_types);
+    let ordinal_size = struct_ordinal_size(&field_types).expr();
     let ordinal = struct_ordinal(
         &field_ref_exprs,
         &field_types,
         proc_macro2::Span::call_site(),
-    )?;
+    )?
+    .expr();
     let from_ordinal = struct_from_ordinal(
         &syn::parse_quote_spanned! { ordinal_var.span() => #ordinal_var },
         vars,

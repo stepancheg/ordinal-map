@@ -1,10 +1,9 @@
 use std::convert::Infallible;
 
 use crate::Ordinal;
-use crate::__macro_refs::ordinal_size_sum;
 
 impl<A: Ordinal> Ordinal for Option<A> {
-    const ORDINAL_SIZE: usize = ordinal_size_sum([A::ORDINAL_SIZE, 1]);
+    const ORDINAL_SIZE: usize = A::ORDINAL_SIZE + 1;
 
     fn ordinal(&self) -> usize {
         match self {
@@ -23,7 +22,7 @@ impl<A: Ordinal> Ordinal for Option<A> {
 }
 
 impl<A: Ordinal, B: Ordinal> Ordinal for Result<A, B> {
-    const ORDINAL_SIZE: usize = ordinal_size_sum([A::ORDINAL_SIZE, B::ORDINAL_SIZE]);
+    const ORDINAL_SIZE: usize = A::ORDINAL_SIZE + B::ORDINAL_SIZE;
 
     fn ordinal(&self) -> usize {
         match self {

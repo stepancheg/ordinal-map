@@ -1,5 +1,4 @@
 use crate::Ordinal;
-use crate::__macro_refs::ordinal_size_sum;
 
 impl Ordinal for bool {
     const ORDINAL_SIZE: usize = 2;
@@ -75,7 +74,7 @@ impl Ordinal for i16 {
 
 /// Accessing this type is compile time error on 32-bit platforms.
 impl Ordinal for u32 {
-    const ORDINAL_SIZE: usize = ordinal_size_sum([u32::MAX as usize, 1]);
+    const ORDINAL_SIZE: usize = u32::MAX as usize + 1;
 
     #[inline]
     fn ordinal(&self) -> usize {

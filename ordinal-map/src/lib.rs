@@ -37,7 +37,6 @@
 #[macro_use(quickcheck)]
 extern crate quickcheck_macros;
 
-pub mod __macro_refs;
 pub(crate) mod array_as_mut;
 pub(crate) mod array_from_iter;
 mod atomic;
