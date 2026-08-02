@@ -44,6 +44,14 @@ impl<T: Ordinal + Debug> Debug for AtomicOrdinal<T> {
     }
 }
 
+/// Default is [`T::default()`](Default::default).
+impl<T: Ordinal + Default> Default for AtomicOrdinal<T> {
+    #[inline]
+    fn default() -> Self {
+        AtomicOrdinal::new(T::default())
+    }
+}
+
 impl<T: Ordinal> AtomicOrdinal<T> {
     /// Store an ordinal value inside [`AtomicUsize`].
     #[inline]

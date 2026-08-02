@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.1.11 - 2026-08-02
+
+- `impl<T: Default> Default for AtomicOrdinal<T>`
+
 # 0.1.10 - 2025-11-22
 
 - More efficient `#[derive(Ordinal)]` code generation (faster to compile)
